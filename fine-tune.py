@@ -13,9 +13,9 @@ from transformers.optimization import get_scheduler
 from transformers.trainer_pt_utils import get_parameter_names
 from transformers.trainer_utils import has_length
 
-from fine_tune.optim.adamwl2sp import AdamWL2SP
-from fine_tune.transformers.trainer_optimizer_init import TrainerOptimizerInit
-from fine_tune.transformers.training_args_l2sp import TrainingArgumentsL2SP
+from transformers_fine_tuning.optim.adamwl2sp import AdamWL2SP
+from transformers_fine_tuning.transformers.trainer_optimizer_init import TrainerOptimizerInit
+from transformers_fine_tuning.transformers.training_args_l2sp import TrainingArgumentsL2SP
 
 USE_OPTIMIZER_INIT = True
 
