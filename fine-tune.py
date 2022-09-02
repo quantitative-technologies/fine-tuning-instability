@@ -30,7 +30,7 @@ WEIGHT_DECAY1 = 200.0
 WEIGHT_DECAY2 = 0.0
 SEED = 10000
 DATA_SEED = 20000
-OPTIMIZER = 'adamw_l2sp'
+OPTIMIZER = 'adamw_torch' # For AdamWL2SP Regularization use: 'adamw_l2sp'
 ADAM_EPSILON = 1e-6
 OUTPUT_DIR = 'output'
 
