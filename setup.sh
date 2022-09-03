@@ -1,7 +1,22 @@
 #!/bin/bash
 
-pip install cloud-tpu-client==0.10 torch==1.12.0 https://storage.googleapis.com/tpu-pytorch/wheels/colab/torch_xla-1.12-cp37-cp37m-linux_x86_64.whl
+# Our experiments were done with torch-1.12.0, datasets-1.11.0, transformers tag v4.20.1 and the torch_xla-1.12 wheel below.
+
+pip install torch==1.12.0
 pip install datasets==1.11.0
+
+# Check for TPU
+output="$(env | grep TPU)"
+
+if [[ -n $output ]]
+then
+    printf "\nTPU detected. Installing torch_xla...\n"
+    pip install cloud-tpu-client==0.10 https://storage.googleapis.com/tpu-pytorch/wheels/colab/torch_xla-1.12-cp37-cp37m-linux_x86_64.whl
+else
+    printf "\nNo TPU detected\n"
+fi
+
+# Additional dependency for our library
 pip install aenum
 
 git clone https://github.com/huggingface/transformers.git
