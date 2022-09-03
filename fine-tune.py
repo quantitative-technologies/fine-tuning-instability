@@ -1,17 +1,12 @@
 import math
 import numpy as np
-import random
-import site
 
-#site.addsitedir('/content/transformers/src')
 import torch
 from torch import nn
 import torch_xla.core.xla_model as xm
 from datasets import load_dataset, load_metric
-from transformers import AutoModel, AutoModelForPreTraining, AutoModelForSequenceClassification, AutoTokenizer, Trainer, TrainingArguments, set_seed
-from transformers.optimization import get_scheduler
+from transformers import AutoModelForPreTraining, AutoModelForSequenceClassification, AutoTokenizer, Trainer, set_seed
 from transformers.trainer_pt_utils import get_parameter_names
-from transformers.trainer_utils import has_length
 
 from transformers_fine_tuning.optim.adamwl2sp import AdamWL2SP
 from transformers_fine_tuning.transformers.trainer_optimizer_init import TrainerOptimizerInit
@@ -57,10 +52,7 @@ model = AutoModelForSequenceClassification.from_pretrained(MODEL_NAME)
 sp_model = AutoModelForPreTraining.from_pretrained(MODEL_NAME)
 sp_model = sp_model.to(xm.xla_device())
 
-# for p in sp_model.parameters():
-#     p.requires_grad = False
-
-torch.save(sp_model, 'sp_model.pt')
+#torch.save(sp_model, 'sp_model.pt')
 
 tokenizer = AutoTokenizer.from_pretrained(MODEL_NAME)
 raw_datasets = load_dataset("glue", TASK)
@@ -79,9 +71,11 @@ def preprocess_function(examples):
     )
     return tokenizer(*args, padding="max_length", max_length=MAX_SEQ_LENGTH, truncation=True)
 
+
 raw_datasets = raw_datasets.map(
     preprocess_function,
-    batched=True)
+    batched=True
+)
 
 # Warning affects randomness
 train_dataset = raw_datasets["train"]
@@ -170,47 +164,5 @@ else:
         compute_metrics=compute_metrics,
         tokenizer=tokenizer)
 
-# Create adamw_torch optimizer manually
-
-if False:
-    # Get the # of training samples
-    train_dataloader = trainer.get_train_dataloader()
-
-    # Setting up training control variables:
-    # number of training epochs: num_train_epochs
-    # number of training steps per epoch: num_update_steps_per_epoch
-    # total number of training steps to execute: max_steps
-    total_train_batch_size = train_args.train_batch_size * train_args.gradient_accumulation_steps * train_args.world_size
-
-    len_dataloader = len(train_dataloader)
-    num_update_steps_per_epoch = len_dataloader // train_args.gradient_accumulation_steps
-    num_update_steps_per_epoch = max(num_update_steps_per_epoch, 1)
-    num_examples = trainer.num_examples(train_dataloader)
-    if train_args.max_steps > 0:
-        max_steps = train_args.max_steps
-        num_train_epochs = train_args.max_steps // num_update_steps_per_epoch + int(
-            train_args.max_steps % num_update_steps_per_epoch > 0
-        )
-        # May be slightly incorrect if the last batch in the training dataloader has a smaller size but it's
-        # the best we can do.
-        num_train_samples = train_args.max_steps * total_train_batch_size
-    else:
-        max_steps = math.ceil(train_args.num_train_epochs * num_update_steps_per_epoch)
-        num_train_epochs = math.ceil(train_args.num_train_epochs)
-        num_train_samples = trainer.num_examples(train_dataloader) * train_args.num_train_epochs
-
-    lr_scheduler = get_scheduler(
-        train_args.lr_scheduler_type,
-        optimizer=optimizer,
-        num_warmup_steps=train_args.get_warmup_steps(max_steps),
-        num_training_steps=max_steps,
-    )
-
-    trainer.optimizer, trainer.lr_scheduler = optimizer, lr_scheduler
 trainer.train()
 
-sp_model2 = torch.load('sp_model.pt')
-
-assert sp_model.state_dict().__str__() == sp_model2.state_dict().__str__()
-
-compare_models(sp_model, sp_model2)
