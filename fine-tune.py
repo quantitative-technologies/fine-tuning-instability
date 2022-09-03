@@ -29,140 +29,152 @@ OPTIMIZER = 'adamw_torch' # For AdamWL2SP Regularization use: 'adamw_l2sp'
 ADAM_EPSILON = 1e-6
 OUTPUT_DIR = 'output'
 
-train_args = TrainingArgumentsL2SP(
-    num_train_epochs=EPOCHS,
-    learning_rate=LEARNING_RATE,
-    per_device_train_batch_size=BATCH_SIZE,
-    per_device_eval_batch_size=BATCH_SIZE,
-    seed=SEED,
-    data_seed=DATA_SEED,
-    optim=OPTIMIZER,
-    weight_decay1=WEIGHT_DECAY1,
-    weight_decay2=WEIGHT_DECAY2,
-    adam_epsilon=ADAM_EPSILON,
-    output_dir=OUTPUT_DIR,
-    overwrite_output_dir=True,
-    evaluation_strategy='epoch',
-    do_eval=True,
-    full_determinism=True
-)
 
-set_seed(SEED)
-model = AutoModelForSequenceClassification.from_pretrained(MODEL_NAME)
-sp_model = AutoModelForPreTraining.from_pretrained(MODEL_NAME)
-sp_model = sp_model.to(xm.xla_device())
-
-#torch.save(sp_model, 'sp_model.pt')
-
-tokenizer = AutoTokenizer.from_pretrained(MODEL_NAME)
-raw_datasets = load_dataset("glue", TASK)
-metric = load_metric("glue", TASK)
-
-
-def compute_metrics(p):
-    preds = p.predictions
-    preds = np.argmax(p.predictions, axis=1)
-    return metric.compute(predictions=preds, references=p.label_ids)
-
-def preprocess_function(examples):
-    # Tokenize the texts
-    args = (
-        (examples['sentence1'], examples['sentence2'])
-    )
-    return tokenizer(*args, padding="max_length", max_length=MAX_SEQ_LENGTH, truncation=True)
-
-
-raw_datasets = raw_datasets.map(
-    preprocess_function,
-    batched=True
-)
-
-# Warning affects randomness
-train_dataset = raw_datasets["train"]
-if MAX_DATA_SIZE is not None:
-    train_dataset = train_dataset.select(range(MAX_DATA_SIZE))
-eval_dataset = raw_datasets["validation"]
-
-# for index in random.sample(range(len(train_dataset)), 3):
-#     print(f"Sample {index} of the training set: {train_dataset[index]}.")
-def adamw_init(model, train_args):
-    decay_parameters = get_parameter_names(model, [torch.nn.LayerNorm])
-    decay_parameters = [name for name in decay_parameters if "bias" not in name]
-    optimizer_grouped_parameters = [
-        {
-            "params": [p for n, p in model.named_parameters() if n in decay_parameters],
-            "weight_decay": train_args.weight_decay,
-        },
-        {
-            "params": [p for n, p in model.named_parameters() if n not in decay_parameters],
-            "weight_decay": 0.0,
-        },
-    ]
-    return torch.optim.AdamW(optimizer_grouped_parameters,
-                             lr=train_args.learning_rate,
-                             betas=(train_args.adam_beta1, train_args.adam_beta2),
-                             eps=train_args.adam_epsilon)
-
-def adamw_l2sp_init(model, train_args):
-    decay_parameters = get_parameter_names(model, [nn.LayerNorm])
-    decay_parameters = [name for name in decay_parameters if "bias" not in name]
-    optimizer_grouped_parameters = [
-        {
-            "params": [p for n, p in model.named_parameters() if n in decay_parameters],
-            "param_names": [n for n, p in model.named_parameters() if n in decay_parameters],
-            "weight_decays": (train_args.weight_decay1, train_args.weight_decay2),
-        },
-        {
-            "params": [p for n, p in model.named_parameters() if n not in decay_parameters],
-            "param_names": [n for n, p in model.named_parameters() if n not in decay_parameters],
-            "weight_decays": (0.0, 0.0),
-        },
-    ]   
-    
-    # Get the SP model parameters
-    sp_params = list(sp_model.named_parameters())
-
-    return AdamWL2SP(
-        optimizer_grouped_parameters,
-        sp_params,
-        lr=train_args.learning_rate,
-        betas=(train_args.adam_beta1, train_args.adam_beta2),
-        eps=train_args.adam_epsilon
+def main():
+    train_args = TrainingArgumentsL2SP(
+        num_train_epochs=EPOCHS,
+        learning_rate=LEARNING_RATE,
+        per_device_train_batch_size=BATCH_SIZE,
+        per_device_eval_batch_size=BATCH_SIZE,
+        seed=SEED,
+        data_seed=DATA_SEED,
+        optim=OPTIMIZER,
+        weight_decay1=WEIGHT_DECAY1,
+        weight_decay2=WEIGHT_DECAY2,
+        adam_epsilon=ADAM_EPSILON,
+        output_dir=OUTPUT_DIR,
+        overwrite_output_dir=True,
+        evaluation_strategy='epoch',
+        do_eval=True,
+        full_determinism=True
     )
 
-def compare_models(model_1, model_2):
-    models_differ = 0
-    for key_item_1, key_item_2 in zip(model_1.state_dict().items(), model_2.state_dict().items()):
-        if torch.equal(key_item_1[1], key_item_2[1]):
-            pass
-        else:
-            models_differ += 1
-            if (key_item_1[0] == key_item_2[0]):
-                print('Mismtach found at', key_item_1[0])
+    set_seed(SEED)
+    model = AutoModelForSequenceClassification.from_pretrained(MODEL_NAME)
+    sp_model = AutoModelForPreTraining.from_pretrained(MODEL_NAME)
+    sp_model = sp_model.to(xm.xla_device())
+
+    #torch.save(sp_model, 'sp_model.pt')
+
+    tokenizer = AutoTokenizer.from_pretrained(MODEL_NAME)
+    raw_datasets = load_dataset("glue", TASK)
+    metric = load_metric("glue", TASK)
+
+
+    def compute_metrics(p):
+        preds = p.predictions
+        preds = np.argmax(p.predictions, axis=1)
+        return metric.compute(predictions=preds, references=p.label_ids)
+
+    def preprocess_function(examples):
+        # Tokenize the texts
+        args = (
+            (examples['sentence1'], examples['sentence2'])
+        )
+        return tokenizer(*args, padding="max_length", max_length=MAX_SEQ_LENGTH, truncation=True)
+
+
+    raw_datasets = raw_datasets.map(
+        preprocess_function,
+        batched=True
+    )
+
+    # Warning affects randomness
+    train_dataset = raw_datasets["train"]
+    if MAX_DATA_SIZE is not None:
+        train_dataset = train_dataset.select(range(MAX_DATA_SIZE))
+    eval_dataset = raw_datasets["validation"]
+
+    # for index in random.sample(range(len(train_dataset)), 3):
+    #     print(f"Sample {index} of the training set: {train_dataset[index]}.")
+    def adamw_init(model, train_args):
+        decay_parameters = get_parameter_names(model, [torch.nn.LayerNorm])
+        decay_parameters = [name for name in decay_parameters if "bias" not in name]
+        optimizer_grouped_parameters = [
+            {
+                "params": [p for n, p in model.named_parameters() if n in decay_parameters],
+                "weight_decay": train_args.weight_decay,
+            },
+            {
+                "params": [p for n, p in model.named_parameters() if n not in decay_parameters],
+                "weight_decay": 0.0,
+            },
+        ]
+        return torch.optim.AdamW(optimizer_grouped_parameters,
+                                lr=train_args.learning_rate,
+                                betas=(train_args.adam_beta1, train_args.adam_beta2),
+                                eps=train_args.adam_epsilon)
+
+    def adamw_l2sp_init(model, train_args):
+        decay_parameters = get_parameter_names(model, [nn.LayerNorm])
+        decay_parameters = [name for name in decay_parameters if "bias" not in name]
+        optimizer_grouped_parameters = [
+            {
+                "params": [p for n, p in model.named_parameters() if n in decay_parameters],
+                "param_names": [n for n, p in model.named_parameters() if n in decay_parameters],
+                "weight_decays": (train_args.weight_decay1, train_args.weight_decay2),
+            },
+            {
+                "params": [p for n, p in model.named_parameters() if n not in decay_parameters],
+                "param_names": [n for n, p in model.named_parameters() if n not in decay_parameters],
+                "weight_decays": (0.0, 0.0),
+            },
+        ]   
+        
+        # Get the SP model parameters
+        sp_params = list(sp_model.named_parameters())
+
+        return AdamWL2SP(
+            optimizer_grouped_parameters,
+            sp_params,
+            lr=train_args.learning_rate,
+            betas=(train_args.adam_beta1, train_args.adam_beta2),
+            eps=train_args.adam_epsilon
+        )
+
+    def compare_models(model_1, model_2):
+        models_differ = 0
+        for key_item_1, key_item_2 in zip(model_1.state_dict().items(), model_2.state_dict().items()):
+            if torch.equal(key_item_1[1], key_item_2[1]):
+                pass
             else:
-                raise Exception
-    if models_differ == 0:
-        print('Models match perfectly! :)')
+                models_differ += 1
+                if (key_item_1[0] == key_item_2[0]):
+                    print('Mismtach found at', key_item_1[0])
+                else:
+                    raise Exception
+        if models_differ == 0:
+            print('Models match perfectly! :)')
 
-OPTIMIZER_INIT = adamw_init if OPTIMIZER == 'adamw_torch' else adamw_l2sp_init if OPTIMIZER == 'adamw_l2sp' else None
+    OPTIMIZER_INIT = adamw_init if OPTIMIZER == 'adamw_torch' else adamw_l2sp_init if OPTIMIZER == 'adamw_l2sp' else None
 
-if USE_OPTIMIZER_INIT:
-    trainer = TrainerOptimizerInit(
-        model=model,
-        args=train_args,
-        train_dataset=train_dataset,
-        eval_dataset=eval_dataset,
-        compute_metrics=compute_metrics,
-        tokenizer=tokenizer,
-        optimizers_init=(OPTIMIZER_INIT, None))
-else:
-    trainer = Trainer(
-        model=model,
-        args=train_args,
-        train_dataset=train_dataset,
-        eval_dataset=eval_dataset,
-        compute_metrics=compute_metrics,
-        tokenizer=tokenizer)
+    if USE_OPTIMIZER_INIT:
+        trainer = TrainerOptimizerInit(
+            model=model,
+            args=train_args,
+            train_dataset=train_dataset,
+            eval_dataset=eval_dataset,
+            compute_metrics=compute_metrics,
+            tokenizer=tokenizer,
+            optimizers_init=(OPTIMIZER_INIT, None))
+    else:
+        trainer = Trainer(
+            model=model,
+            args=train_args,
+            train_dataset=train_dataset,
+            eval_dataset=eval_dataset,
+            compute_metrics=compute_metrics,
+            tokenizer=tokenizer)
 
-trainer.train()
+    trainer.train()
+
+
+def _mp_fn(index):
+    # For xla_spawn (TPUs)
+    main()
+
+
+if __name__ == "__main__":
+    main()
+
 
