@@ -21,12 +21,14 @@ MAX_SEQ_LENGTH = 128
 EPOCHS = 3
 BATCH_SIZE = 16
 LEARNING_RATE = 2e-5
+OPTIMIZER = 'adamw_torch' # For AdamWL2SP Regularization use: 'adamw_l2sp'
+ADAM_EPSILON = 1e-6
+ADAM_BETA1 = 0.9
+ADAM_BETA2 = 0.999
 WEIGHT_DECAY1 = 0.5
 WEIGHT_DECAY2 = 0.0
 SEED = 10013
 DATA_SEED = 20000
-OPTIMIZER = 'adamw_torch' # For AdamWL2SP Regularization use: 'adamw_l2sp'
-ADAM_EPSILON = 1e-6
 OUTPUT_DIR = 'output'
 
 
@@ -38,10 +40,12 @@ def main():
         per_device_eval_batch_size=BATCH_SIZE,
         seed=SEED,
         data_seed=DATA_SEED,
-        optim=OPTIMIZER,
+        optim=OPTIMIZER,        
+        adam_epsilon=ADAM_EPSILON,
+        adam_beta1 = ADAM_BETA1,
+        adam_beta2 = ADAM_BETA2,
         weight_decay1=WEIGHT_DECAY1,
         weight_decay2=WEIGHT_DECAY2,
-        adam_epsilon=ADAM_EPSILON,
         output_dir=OUTPUT_DIR,
         overwrite_output_dir=True,
         evaluation_strategy='epoch',
@@ -53,8 +57,6 @@ def main():
     model = AutoModelForSequenceClassification.from_pretrained(MODEL_NAME)
     sp_model = AutoModelForPreTraining.from_pretrained(MODEL_NAME)
     sp_model = sp_model.to(xm.xla_device())
-
-    #torch.save(sp_model, 'sp_model.pt')
 
     tokenizer = AutoTokenizer.from_pretrained(MODEL_NAME)
     raw_datasets = load_dataset("glue", TASK)
