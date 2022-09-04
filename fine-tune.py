@@ -2,7 +2,6 @@ import numpy as np
 
 import torch
 from torch import nn
-import torch_xla.core.xla_model as xm
 from datasets import load_dataset, load_metric
 from transformers import AutoModelForPreTraining, AutoModelForSequenceClassification, AutoTokenizer, Trainer, set_seed
 from transformers.trainer_pt_utils import get_parameter_names
@@ -34,6 +33,8 @@ MAX_GRAD_NORM = 1.0
 SEED = 10013
 DATA_SEED = 20003
 OUTPUT_DIR = 'output'
+# This will be ignored if torch_xla is installed
+DEVICE = 'cuda'
 
 
 def main():
@@ -65,7 +66,12 @@ def main():
     set_seed(SEED)
     model = AutoModelForSequenceClassification.from_pretrained(MODEL_NAME)
     sp_model = AutoModelForPreTraining.from_pretrained(MODEL_NAME)
-    sp_model = sp_model.to(xm.xla_device())
+    # We need to manually place sp_model on the device to get accelerated learning
+    try:
+        import torch_xla.core.xla_model as xm
+        sp_model = sp_model.to(xm.xla_device())
+    except e:
+        sp_model = sp_model.to(DEVICE)
 
     tokenizer = AutoTokenizer.from_pretrained(MODEL_NAME)
     raw_datasets = load_dataset("glue", TASK)
