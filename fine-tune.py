@@ -70,7 +70,7 @@ def main():
     try:
         import torch_xla.core.xla_model as xm
         sp_model = sp_model.to(xm.xla_device())
-    except e:
+    except ModuleNotFoundError as e:
         sp_model = sp_model.to(DEVICE)
 
     tokenizer = AutoTokenizer.from_pretrained(MODEL_NAME)
