@@ -14,6 +14,7 @@ from transformers_fine_tuning.transformers.training_args_l2sp import TrainingArg
 # This must be True to use adamw_l2sp, because the custom optimizer is not natively supported by Trainer
 USE_OPTIMIZER_INIT = True
 
+# Hyperparameter settings from Mosbach, et. al. On the Stability of Fine-tuning BERT: Misconceptions, Explanations, and Strong Baselines
 MODEL_NAME = 'albert-large-v2'
 TASK = 'rte'
 MAX_DATA_SIZE = None
@@ -22,6 +23,7 @@ EPOCHS = 3
 BATCH_SIZE = 16
 LEARNING_RATE = 2e-5
 LR_SCHEDULE = 'linear'
+WARMUP_RATIO = 0.1
 OPTIMIZER = 'adamw_torch' # For AdamWL2SP Regularization use: 'adamw_l2sp'
 ADAM_EPSILON = 1e-6
 ADAM_BETA1 = 0.9
@@ -30,7 +32,7 @@ WEIGHT_DECAY1 = 0.5
 WEIGHT_DECAY2 = 0.0
 MAX_GRAD_NORM = 1.0
 SEED = 10013
-DATA_SEED = 20000
+DATA_SEED = 20003
 OUTPUT_DIR = 'output'
 
 
@@ -44,6 +46,7 @@ def main():
         data_seed=DATA_SEED,
         learning_rate=LEARNING_RATE,
         lr_scheduler_type=LR_SCHEDULE,
+        warmup_ratio=WARMUP_RATIO,
         optim=OPTIMIZER,        
         adam_epsilon=ADAM_EPSILON,
         adam_beta1 = ADAM_BETA1,
@@ -85,14 +88,11 @@ def main():
         batched=True
     )
 
-    # Warning affects randomness
     train_dataset = raw_datasets["train"]
     if MAX_DATA_SIZE is not None:
         train_dataset = train_dataset.select(range(MAX_DATA_SIZE))
     eval_dataset = raw_datasets["validation"]
 
-    # for index in random.sample(range(len(train_dataset)), 3):
-    #     print(f"Sample {index} of the training set: {train_dataset[index]}.")
     def adamw_init(model, train_args):
         decay_parameters = get_parameter_names(model, [torch.nn.LayerNorm])
         decay_parameters = [
