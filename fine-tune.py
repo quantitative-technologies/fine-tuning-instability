@@ -21,31 +21,36 @@ MAX_SEQ_LENGTH = 128
 EPOCHS = 3
 BATCH_SIZE = 16
 LEARNING_RATE = 2e-5
+LR_SCHEDULE = 'linear'
 OPTIMIZER = 'adamw_torch' # For AdamWL2SP Regularization use: 'adamw_l2sp'
 ADAM_EPSILON = 1e-6
 ADAM_BETA1 = 0.9
 ADAM_BETA2 = 0.999
 WEIGHT_DECAY1 = 0.5
 WEIGHT_DECAY2 = 0.0
+MAX_GRAD_NORM = 1.0
 SEED = 10013
 DATA_SEED = 20000
 OUTPUT_DIR = 'output'
 
 
 def main():
+    # hyperparameters and other args for fine-tuning
     train_args = TrainingArgumentsL2SP(
         num_train_epochs=EPOCHS,
-        learning_rate=LEARNING_RATE,
         per_device_train_batch_size=BATCH_SIZE,
         per_device_eval_batch_size=BATCH_SIZE,
         seed=SEED,
         data_seed=DATA_SEED,
+        learning_rate=LEARNING_RATE,
+        lr_scheduler_type=LR_SCHEDULE,
         optim=OPTIMIZER,        
         adam_epsilon=ADAM_EPSILON,
         adam_beta1 = ADAM_BETA1,
         adam_beta2 = ADAM_BETA2,
         weight_decay1=WEIGHT_DECAY1,
         weight_decay2=WEIGHT_DECAY2,
+        max_grad_norm=MAX_GRAD_NORM,
         output_dir=OUTPUT_DIR,
         overwrite_output_dir=True,
         evaluation_strategy='epoch',
@@ -53,6 +58,7 @@ def main():
         full_determinism=True
     )
 
+    # Set seed here before model initialization
     set_seed(SEED)
     model = AutoModelForSequenceClassification.from_pretrained(MODEL_NAME)
     sp_model = AutoModelForPreTraining.from_pretrained(MODEL_NAME)
