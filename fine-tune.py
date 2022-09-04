@@ -26,7 +26,7 @@ WEIGHT_DECAY2 = 0.0
 SEED = 10013
 DATA_SEED = 20000
 OPTIMIZER = 'adamw_l2sp'
-#OPTIMIZER = 'adamw_torch' # For AdamWL2SP Regularization use: 'adamw_l2sp'
+# OPTIMIZER = 'adamw_torch' # For AdamWL2SP Regularization use: 'adamw_l2sp'
 ADAM_EPSILON = 1e-6
 OUTPUT_DIR = 'output'
 
@@ -61,7 +61,6 @@ def main():
     raw_datasets = load_dataset("glue", TASK)
     metric = load_metric("glue", TASK)
 
-
     def compute_metrics(p):
         preds = p.predictions
         preds = np.argmax(p.predictions, axis=1)
@@ -73,7 +72,6 @@ def main():
             (examples['sentence1'], examples['sentence2'])
         )
         return tokenizer(*args, padding="max_length", max_length=MAX_SEQ_LENGTH, truncation=True)
-
 
     raw_datasets = raw_datasets.map(
         preprocess_function,
@@ -90,7 +88,8 @@ def main():
     #     print(f"Sample {index} of the training set: {train_dataset[index]}.")
     def adamw_init(model, train_args):
         decay_parameters = get_parameter_names(model, [torch.nn.LayerNorm])
-        decay_parameters = [name for name in decay_parameters if "bias" not in name]
+        decay_parameters = [
+            name for name in decay_parameters if "bias" not in name]
         optimizer_grouped_parameters = [
             {
                 "params": [p for n, p in model.named_parameters() if n in decay_parameters],
@@ -102,13 +101,15 @@ def main():
             },
         ]
         return torch.optim.AdamW(optimizer_grouped_parameters,
-                                lr=train_args.learning_rate,
-                                betas=(train_args.adam_beta1, train_args.adam_beta2),
-                                eps=train_args.adam_epsilon)
+                                 lr=train_args.learning_rate,
+                                 betas=(train_args.adam_beta1,
+                                        train_args.adam_beta2),
+                                 eps=train_args.adam_epsilon)
 
     def adamw_l2sp_init(model, train_args):
         decay_parameters = get_parameter_names(model, [nn.LayerNorm])
-        decay_parameters = [name for name in decay_parameters if "bias" not in name]
+        decay_parameters = [
+            name for name in decay_parameters if "bias" not in name]
         optimizer_grouped_parameters = [
             {
                 "params": [p for n, p in model.named_parameters() if n in decay_parameters],
@@ -120,8 +121,8 @@ def main():
                 "param_names": [n for n, p in model.named_parameters() if n not in decay_parameters],
                 "weight_decays": (0.0, 0.0),
             },
-        ]   
-        
+        ]
+
         # Get the SP model parameters
         sp_params = list(sp_model.named_parameters())
 
@@ -163,5 +164,3 @@ def _mp_fn(index):
 
 if __name__ == "__main__":
     main()
-
-
