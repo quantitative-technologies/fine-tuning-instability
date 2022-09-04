@@ -11,6 +11,7 @@ from transformers_fine_tuning.optim.adamwl2sp import AdamWL2SP
 from transformers_fine_tuning.transformers.trainer_optimizer_init import TrainerOptimizerInit
 from transformers_fine_tuning.transformers.training_args_l2sp import TrainingArgumentsL2SP
 
+# This must be True to use adamw_l2sp, because the custom optimizer is not natively supported by Trainer
 USE_OPTIMIZER_INIT = False
 
 MODEL_NAME = 'albert-large-v2'
@@ -20,11 +21,12 @@ MAX_SEQ_LENGTH = 128
 EPOCHS = 3
 BATCH_SIZE = 16
 LEARNING_RATE = 2e-5
-WEIGHT_DECAY1 = 200.0
+WEIGHT_DECAY1 = 0.5
 WEIGHT_DECAY2 = 0.0
 SEED = 10013
 DATA_SEED = 20000
-OPTIMIZER = 'adamw_torch' # For AdamWL2SP Regularization use: 'adamw_l2sp'
+OPTIMIZER = 'adamw_l2sp'
+#OPTIMIZER = 'adamw_torch' # For AdamWL2SP Regularization use: 'adamw_l2sp'
 ADAM_EPSILON = 1e-6
 OUTPUT_DIR = 'output'
 
