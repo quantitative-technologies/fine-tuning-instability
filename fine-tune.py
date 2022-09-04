@@ -36,7 +36,9 @@ MAX_GRAD_NORM = 1.0
 SEED = 10013
 DATA_SEED = 20003
 OUTPUT_DIR = 'output'
-LOG_LEVEL = 'passive'
+LOG_LEVEL = 'passive'  
+# This will turn off additional logging
+NO_LOGGING = True
 # This will be ignored if torch_xla is installed
 DEVICE = 'cuda'  # Use 'cpu' for no cuda (slow!)
 
@@ -62,7 +64,6 @@ def main():
         output_dir=OUTPUT_DIR,
         overwrite_output_dir=True,
         evaluation_strategy='epoch',
-        logging_strategy='epoch',
         log_level=LOG_LEVEL,
         do_eval=True,
         full_determinism=True,
@@ -154,20 +155,21 @@ def main():
             eps=train_args.adam_epsilon
         )
     
-     # Setup logging
-    logger = logging.getLogger(__name__)
+    # Setup logging
+    if not NO_LOGGING:
+        logger = logging.getLogger(__name__)
 
-    logging.basicConfig(
-        format="%(asctime)s - %(levelname)s - %(name)s - %(message)s",
-        datefmt="%m/%d/%Y %H:%M:%S",
-        handlers=[logging.StreamHandler(sys.stdout)],
-    )
-    log_level = train_args.get_process_log_level()
-    logger.setLevel(log_level)
-    datasets.utils.logging.set_verbosity(log_level)
-    transformers.utils.logging.set_verbosity(log_level)
-    transformers.utils.logging.enable_default_handler()
-    transformers.utils.logging.enable_explicit_format()
+        logging.basicConfig(
+            format="%(asctime)s - %(levelname)s - %(name)s - %(message)s",
+            datefmt="%m/%d/%Y %H:%M:%S",
+            handlers=[logging.StreamHandler(sys.stdout)],
+        )
+        log_level = train_args.get_process_log_level()
+        logger.setLevel(log_level)
+        datasets.utils.logging.set_verbosity(log_level)
+        transformers.utils.logging.set_verbosity(log_level)
+        transformers.utils.logging.enable_default_handler()
+        transformers.utils.logging.enable_explicit_format()
 
     OPTIMIZER_INIT = adamw_init if OPTIMIZER == 'adamw_torch' else adamw_l2sp_init if OPTIMIZER == 'adamw_l2sp' else None
 
