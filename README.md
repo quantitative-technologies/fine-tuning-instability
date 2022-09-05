@@ -13,7 +13,7 @@ The optimizer is implemented in [`src/transformers_fine_tuning/optim/adamwl2sp.p
 the PyTorch implementation of [`AdamW`](https://pytorch.org/docs/stable/generated/torch.optim.AdamW.html).
 
 [`src/transformers_fine_tuning/transformers/trainer_optimizer_init.py`](https://github.com/quantitative-technologies/fine-tuning-instability/blob/master/src/transformers_fine_tuning/transformers/trainer_optimizer_init.py) 
-is a subclass of `Trainer` from the :huggingface: `transformers` library that 
+is a subclass of `Trainer` from the [🤗](https://huggingface.co) `transformers` library that 
 facilitates custom optimizers, such as our `AdamWL2SP`. It is not strictly 
 necessary but we prefer the design to `Trainer`. (In case of further interest, 
 see [Passing optimizer to Trainer constructor does not work #18635](https://github.com/huggingface/transformers/issues/18635#issue-1339386290).)
