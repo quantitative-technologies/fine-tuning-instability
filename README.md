@@ -18,7 +18,7 @@ facilitates custom optimizers, such as our `AdamWL2SP`. It is not strictly
 necessary but we prefer the design to `Trainer`. (In case of further interest, 
 see [Passing optimizer to Trainer constructor does not work #18635](https://github.com/huggingface/transformers/issues/18635#issue-1339386290).)
 
-The example script `fine-tune.py` demonstrates using our code to fine-tune 
+The example script [`fine-tune.py`](https://github.com/quantitative-technologies/fine-tuning-instability/blob/master/fine-tune.py) demonstrates using our code to fine-tune 
 ALBERT on the RTE task, using optimizers such as `AdamW` from `torch`, or our 
 custom `AdamWL2SP` optimizer. The hyperparameters are set the same as were used
 in our experiments. The model, optimizer, task, random seeds and hyperparameters
