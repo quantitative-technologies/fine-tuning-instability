@@ -1,0 +1,704 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+    <title>Fine-Tuning Instability &#8212; Fine-Tuning Instability for Large Language Models</title>
+    
+  <!-- Loaded before other Sphinx assets -->
+  <link href="_static/styles/theme.css?digest=1999514e3f237ded88cf" rel="stylesheet">
+<link href="_static/styles/pydata-sphinx-theme.css?digest=1999514e3f237ded88cf" rel="stylesheet">
+
+    
+  <link rel="stylesheet"
+    href="_static/vendor/fontawesome/5.13.0/css/all.min.css">
+  <link rel="preload" as="font" type="font/woff2" crossorigin
+    href="_static/vendor/fontawesome/5.13.0/webfonts/fa-solid-900.woff2">
+  <link rel="preload" as="font" type="font/woff2" crossorigin
+    href="_static/vendor/fontawesome/5.13.0/webfonts/fa-brands-400.woff2">
+
+    <link rel="stylesheet" type="text/css" href="_static/pygments.css" />
+    <link rel="stylesheet" href="_static/styles/sphinx-book-theme.css?digest=62ba249389abaaa9ffc34bf36a076bdc1d65ee18" type="text/css" />
+    <link rel="stylesheet" type="text/css" href="_static/togglebutton.css" />
+    <link rel="stylesheet" type="text/css" href="_static/copybutton.css" />
+    <link rel="stylesheet" type="text/css" href="_static/mystnb.css" />
+    <link rel="stylesheet" type="text/css" href="_static/sphinx-thebe.css" />
+    <link rel="stylesheet" type="text/css" href="_static/design-style.b7bb847fb20b106c3d81b95245e65545.min.css" />
+    
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="_static/scripts/pydata-sphinx-theme.js?digest=1999514e3f237ded88cf">
+
+    <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
+    <script src="_static/jquery.js"></script>
+    <script src="_static/underscore.js"></script>
+    <script src="_static/doctools.js"></script>
+    <script src="_static/clipboard.min.js"></script>
+    <script src="_static/copybutton.js"></script>
+    <script src="_static/scripts/sphinx-book-theme.js?digest=f31d14ad54b65d19161ba51d4ffff3a77ae00456"></script>
+    <script>let toggleHintShow = 'Click to show';</script>
+    <script>let toggleHintHide = 'Click to hide';</script>
+    <script>let toggleOpenOnPrint = 'true';</script>
+    <script src="_static/togglebutton.js"></script>
+    <script>var togglebuttonSelector = '.toggle, .admonition.dropdown, .tag_hide_input div.cell_input, .tag_hide-input div.cell_input, .tag_hide_output div.cell_output, .tag_hide-output div.cell_output, .tag_hide_cell.cell, .tag_hide-cell.cell';</script>
+    <script src="_static/design-tabs.js"></script>
+    <script>const THEBE_JS_URL = "https://unpkg.com/thebe@0.8.2/lib/index.js"
+const thebe_selector = ".thebe,.cell"
+const thebe_selector_input = "pre"
+const thebe_selector_output = ".output, .cell_output"
+</script>
+    <script async="async" src="_static/sphinx-thebe.js"></script>
+    <script>window.MathJax = {"tex": {"macros": {"N": "\\mathbb{N}", "e": "\\mathrm{e}", "th": "^{\\mathrm{th}}", "s": "^{\\mathrm{src}}", "sp": "\\mathrm{SP}", "ltwo": "L^2", "ltsp": "\\ltwo-\\sp", "thetas": "\\theta^{\\mathrm{s}}", "thetan": "\\theta^{-\\mathrm{s}}"}}, "options": {"processHtmlClass": "tex2jax_process|mathjax_process|math|output_area"}}</script>
+    <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="\(\ltsp\) Regularization" href="l2sp_regularization.html" />
+    <link rel="prev" title="Overview" href="intro.html" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="docsearch:language" content="None">
+    
+
+    <!-- Google Analytics -->
+    
+  </head>
+  <body data-spy="scroll" data-target="#bd-toc-nav" data-offset="60">
+<!-- Checkboxes to toggle the left sidebar -->
+<input type="checkbox" class="sidebar-toggle" name="__navigation" id="__navigation" aria-label="Toggle navigation sidebar">
+<label class="overlay overlay-navbar" for="__navigation">
+    <div class="visually-hidden">Toggle navigation sidebar</div>
+</label>
+<!-- Checkboxes to toggle the in-page toc -->
+<input type="checkbox" class="sidebar-toggle" name="__page-toc" id="__page-toc" aria-label="Toggle in-page Table of Contents">
+<label class="overlay overlay-pagetoc" for="__page-toc">
+    <div class="visually-hidden">Toggle in-page Table of Contents</div>
+</label>
+<!-- Headers at the top -->
+<div class="announcement header-item noprint"></div>
+<div class="header header-item noprint"></div>
+
+    
+    <div class="container-fluid" id="banner"></div>
+
+    
+
+    <div class="container-xl">
+      <div class="row">
+          
+<!-- Sidebar -->
+<div class="bd-sidebar noprint" id="site-navigation">
+    <div class="bd-sidebar__content">
+        <div class="bd-sidebar__top"><div class="navbar-brand-box">
+    <a class="navbar-brand text-wrap" href="index.html">
+      
+      
+      
+      <h1 class="site-logo" id="site-title">Fine-Tuning Instability for Large Language Models</h1>
+      
+    </a>
+</div><form class="bd-search d-flex align-items-center" action="search.html" method="get">
+  <i class="icon fas fa-search"></i>
+  <input type="search" class="form-control" name="q" id="search-input" placeholder="Search the docs ..." aria-label="Search the docs ..." autocomplete="off" >
+</form><nav class="bd-links" id="bd-docs-nav" aria-label="Main">
+    <div class="bd-toc-item active">
+        <ul class="current nav bd-sidenav">
+ <li class="toctree-l1 current active">
+  <a class="current reference internal" href="#">
+   Fine-Tuning Instability
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="l2sp_regularization.html">
+   <span class="math notranslate nohighlight">
+    \(\ltsp\)
+   </span>
+   Regularization
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="conclusion.html">
+   Conculsions
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="references.html">
+   References
+  </a>
+ </li>
+</ul>
+
+    </div>
+</nav></div>
+        <div class="bd-sidebar__bottom">
+             <!-- To handle the deprecated key -->
+            
+            <div class="navbar_extra_footer">
+            <a href="https://quantitative-technologies.com/" style="font-size:150%;">
+  <b>Quantitative Technologies</b>
+</a>
+
+            </div>
+            
+        </div>
+    </div>
+    <div id="rtd-footer-container"></div>
+</div>
+
+
+          
+
+
+          
+<!-- A tiny helper pixel to detect if we've scrolled -->
+<div class="sbt-scroll-pixel-helper"></div>
+<!-- Main content -->
+<div class="col py-0 content-container">
+    
+    <div class="header-article row sticky-top noprint">
+        
+
+
+
+<div class="col py-1 d-flex header-article-main">
+    <div class="header-article__left">
+        
+        <label for="__navigation"
+  class="headerbtn"
+  data-toggle="tooltip"
+data-placement="right"
+title="Toggle navigation"
+>
+  
+
+<span class="headerbtn__icon-container">
+  <i class="fas fa-bars"></i>
+  </span>
+
+</label>
+
+        
+    </div>
+    <div class="header-article__right">
+<button onclick="toggleFullScreen()"
+  class="headerbtn"
+  data-toggle="tooltip"
+data-placement="bottom"
+title="Fullscreen mode"
+>
+  
+
+<span class="headerbtn__icon-container">
+  <i class="fas fa-expand"></i>
+  </span>
+
+</button>
+
+<div class="menu-dropdown menu-dropdown-repository-buttons">
+  <button class="headerbtn menu-dropdown__trigger"
+      aria-label="Source repositories">
+      <i class="fab fa-github"></i>
+  </button>
+  <div class="menu-dropdown__content">
+    <ul>
+      <li>
+        <a href="https://github.com/quantitative-technologies/fine-tuning-instability"
+   class="headerbtn"
+   data-toggle="tooltip"
+data-placement="left"
+title="Source repository"
+>
+  
+
+<span class="headerbtn__icon-container">
+  <i class="fab fa-github"></i>
+  </span>
+<span class="headerbtn__text-container">repository</span>
+</a>
+
+      </li>
+      
+      <li>
+        <a href="https://github.com/quantitative-technologies/fine-tuning-instability/issues/new?title=Issue%20on%20page%20%2Finstability.html&body=Your%20issue%20content%20here."
+   class="headerbtn"
+   data-toggle="tooltip"
+data-placement="left"
+title="Open an issue"
+>
+  
+
+<span class="headerbtn__icon-container">
+  <i class="fas fa-lightbulb"></i>
+  </span>
+<span class="headerbtn__text-container">open issue</span>
+</a>
+
+      </li>
+      
+    </ul>
+  </div>
+</div>
+<label for="__page-toc"
+  class="headerbtn headerbtn-page-toc"
+  
+>
+  
+
+<span class="headerbtn__icon-container">
+  <i class="fas fa-list"></i>
+  </span>
+
+</label>
+
+    </div>
+</div>
+
+<!-- Table of contents -->
+<div class="col-md-3 bd-toc show noprint">
+    <div class="tocsection onthispage pt-5 pb-3">
+        <i class="fas fa-list"></i> Contents
+    </div>
+    <nav id="bd-toc-nav" aria-label="Page">
+        <ul class="visible nav section-nav flex-column">
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#current-state-of-instability-for-fine-tuning-llms">
+   Current State of Instability for Fine-Tuning LLMs
+  </a>
+  <ul class="nav section-nav flex-column">
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#reporting-sota-results">
+     Reporting SOTA Results
+    </a>
+   </li>
+  </ul>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#catastrophic-forgetting">
+   Catastrophic Forgetting
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#albert">
+   ALBERT
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#fine-tuning-data">
+   Fine-Tuning Data
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#experiments">
+   Experiments
+  </a>
+  <ul class="nav section-nav flex-column">
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#seeding">
+     Seeding
+    </a>
+   </li>
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#short-runs">
+     Short Runs
+    </a>
+    <ul class="nav section-nav flex-column">
+     <li class="toc-h4 nav-item toc-entry">
+      <a class="reference internal nav-link" href="#hyperparameter-and-model-selection">
+       Hyperparameter and Model Selection
+      </a>
+     </li>
+    </ul>
+   </li>
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#long-runs">
+     Long Runs
+    </a>
+    <ul class="nav section-nav flex-column">
+     <li class="toc-h4 nav-item toc-entry">
+      <a class="reference internal nav-link" href="#accuracy-vs-epoch-plot">
+       Accuracy vs Epoch Plot
+      </a>
+     </li>
+    </ul>
+   </li>
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#very-long-runs">
+     Very Long Runs
+    </a>
+   </li>
+  </ul>
+ </li>
+</ul>
+
+    </nav>
+</div>
+    </div>
+    <div class="article row">
+        <div class="col pl-md-3 pl-lg-5 content-container">
+            <!-- Table of contents that is only displayed when printing the page -->
+            <div id="jb-print-docs-body" class="onlyprint">
+                <h1>Fine-Tuning Instability</h1>
+                <!-- Table of contents -->
+                <div id="print-main-content">
+                    <div id="jb-print-toc">
+                        
+                        <div>
+                            <h2> Contents </h2>
+                        </div>
+                        <nav aria-label="Page">
+                            <ul class="visible nav section-nav flex-column">
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#current-state-of-instability-for-fine-tuning-llms">
+   Current State of Instability for Fine-Tuning LLMs
+  </a>
+  <ul class="nav section-nav flex-column">
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#reporting-sota-results">
+     Reporting SOTA Results
+    </a>
+   </li>
+  </ul>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#catastrophic-forgetting">
+   Catastrophic Forgetting
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#albert">
+   ALBERT
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#fine-tuning-data">
+   Fine-Tuning Data
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#experiments">
+   Experiments
+  </a>
+  <ul class="nav section-nav flex-column">
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#seeding">
+     Seeding
+    </a>
+   </li>
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#short-runs">
+     Short Runs
+    </a>
+    <ul class="nav section-nav flex-column">
+     <li class="toc-h4 nav-item toc-entry">
+      <a class="reference internal nav-link" href="#hyperparameter-and-model-selection">
+       Hyperparameter and Model Selection
+      </a>
+     </li>
+    </ul>
+   </li>
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#long-runs">
+     Long Runs
+    </a>
+    <ul class="nav section-nav flex-column">
+     <li class="toc-h4 nav-item toc-entry">
+      <a class="reference internal nav-link" href="#accuracy-vs-epoch-plot">
+       Accuracy vs Epoch Plot
+      </a>
+     </li>
+    </ul>
+   </li>
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#very-long-runs">
+     Very Long Runs
+    </a>
+   </li>
+  </ul>
+ </li>
+</ul>
+
+                        </nav>
+                    </div>
+                </div>
+            </div>
+            <main id="main-content" role="main">
+                
+              <div>
+                
+  <div class="cell tag_remove-input docutils container">
+</div>
+<div class="cell tag_remove-input docutils container">
+</div>
+<div class="cell tag_remove-input docutils container">
+</div>
+<div class="cell tag_remove-input docutils container">
+</div>
+<section class="tex2jax_ignore mathjax_ignore" id="fine-tuning-instability">
+<span id="instability"></span><h1>Fine-Tuning Instability<a class="headerlink" href="#fine-tuning-instability" title="Permalink to this headline">#</a></h1>
+<p>Transfer learning from large language models (LLMs) is of fundamental importance with widespread use in the NLP landscape.
+Typically these models are pre-trainined on large corpora of text and then fine-tuned on a smaller dataset for the purpose of some
+downstream task. The fine-tuning approach was especially popularized with the advent of the BERT model <span id="id1">[<a class="reference internal" href="references.html#id10" title="Jacob Devlin, Ming-Wei Chang, Kenton Lee, and Kristina Toutanova. BERT: Pre-training of Deep Bidirectional Transformers for Language Understanding. In Proceedings of the 2019 Conference of the North American Chapter of the Association for Computational Linguistics: Human Language Technologies, Volume 1 (Long and Short Papers), 4171–4186. Minneapolis, Minnesota, June 2019. Association for Computational Linguistics. URL: https://aclanthology.org/N19-1423 (visited on 2022-07-18), doi:10.18653/v1/N19-1423.">DCLT19</a>]</span>, where the bidirectional language representation greatly improved the language understanding over prior architectures.</p>
+<p>Despite its popularity fine-tuning LLMs is not well-understood and suffers from practical difficulties, the most problematic being <em>instability</em> in the fine-tuning process.
+This refers to the deviation in the peformance of models which have been fine-tuned on the same fixed dataset from the same pre-trained model under the same procedure, due to the randomness in the process. The two sources of randomness are:</p>
+<p>(1) The model initialization, where the final layer or “head” of the model which is specialized to the fine-tuning task at hand is randomly initialized.</p>
+<p>(2) Randomness in the order of the training (i.e. fine-tuning) data due to shuffling.</p>
+<p>It was observed in <span id="id2">[<a class="reference internal" href="references.html#id10" title="Jacob Devlin, Ming-Wei Chang, Kenton Lee, and Kristina Toutanova. BERT: Pre-training of Deep Bidirectional Transformers for Language Understanding. In Proceedings of the 2019 Conference of the North American Chapter of the Association for Computational Linguistics: Human Language Technologies, Volume 1 (Long and Short Papers), 4171–4186. Minneapolis, Minnesota, June 2019. Association for Computational Linguistics. URL: https://aclanthology.org/N19-1423 (visited on 2022-07-18), doi:10.18653/v1/N19-1423.">DCLT19</a>]</span> the performance of fine-tuned <span class="math notranslate nohighlight">\(\mathrm{BERT}_{\mathrm{LARGE}}\)</span> models showed a large variance over different random seeds (though not nearly as much for the smaller <span class="math notranslate nohighlight">\(\mathrm{BERT}_{\mathrm{BASE}}\)</span> model). Fine-tuning instability causes a great deal of inefficiency. It requires time and effort on the part of the practitioner and costs compute time, i.e. model deployment costs, to perform multiple fine-tuning trails for model selection in order to obtain a high-peforming instance.
+This instability also makes comparisons for scientific purposes difficult (<span id="id3">[<a class="reference internal" href="references.html#id8" title="Jesse Dodge, Gabriel Ilharco, Roy Schwartz, Ali Farhadi, Hannaneh Hajishirzi, and Noah Smith. Fine-Tuning Pretrained Language Models: Weight Initializations, Data Orders, and Early Stopping. arXiv:2002.06305 [cs], February 2020. arXiv: 2002.06305. URL: http://arxiv.org/abs/2002.06305 (visited on 2022-04-12).">DIS+20</a>]</span>).</p>
+<section id="current-state-of-instability-for-fine-tuning-llms">
+<span id="current-state"></span><h2>Current State of Instability for Fine-Tuning LLMs<a class="headerlink" href="#current-state-of-instability-for-fine-tuning-llms" title="Permalink to this headline">#</a></h2>
+<p>The fine-tuning instability of BERT was noted from its introduction in <span id="id4">[<a class="reference internal" href="references.html#id10" title="Jacob Devlin, Ming-Wei Chang, Kenton Lee, and Kristina Toutanova. BERT: Pre-training of Deep Bidirectional Transformers for Language Understanding. In Proceedings of the 2019 Conference of the North American Chapter of the Association for Computational Linguistics: Human Language Technologies, Volume 1 (Long and Short Papers), 4171–4186. Minneapolis, Minnesota, June 2019. Association for Computational Linguistics. URL: https://aclanthology.org/N19-1423 (visited on 2022-07-18), doi:10.18653/v1/N19-1423.">DCLT19</a>]</span>, where it was attributed to the small fine-tuning dataset size. It is also still considered a cause in more recent works, e.g. <span id="id5">[<a class="reference internal" href="references.html#id5" title="Hang Hua, Xingjian Li, Dejing Dou, Cheng-Zhong Xu, and Jiebo Luo. Noise Stability Regularization for Improving BERT Fine-tuning. In Proceedings of the 2021 Conference of the North American Chapter of the Association for Computational Linguistics, 3229–3241. July 2021. arXiv: 2107.04835. URL: https://aclanthology.org/2020.acl-main.197.pdf (visited on 2022-04-23).">HLD+21</a>, <a class="reference internal" href="references.html#id4" title="Haoming Jiang, Pengcheng He, Weizhu Chen, Xiaodong Liu, Jianfeng Gao, and Tuo Zhao. SMART: Robust and Efficient Fine-Tuning for Pre-trained Natural Language Models through Principled Regularized Optimization. In Proceedings of the 58th Annual Meeting of the Association for Computational Linguistics,, 2177–2190. April 2020. URL: https://www.microsoft.com/en-us/research/publication/smart-robust-and-efficient-fine-tuning-for-pre-trained-natural-language-models-through-principled-regularized-optimization/ (visited on 2022-04-23).">JHC+20</a>]</span>.
+However, <span id="id6">[<a class="reference internal" href="references.html#id9" title="Marius Mosbach, Maksym Andriushchenko, and Dietrich Klakow. On the Stability of Fine-tuning BERT: Misconceptions, Explanations, and Strong Baselines. arXiv:2006.04884 [cs, stat], March 2021. arXiv: 2006.04884. URL: http://arxiv.org/abs/2006.04884 (visited on 2022-04-11).">MAK21</a>]</span> demonstrates that this instability is not explained by the size of the fine-tuning set. They conclude that the instability is entirely an optimization issue, but we hope for a deeper understanding on whether this is truly the case.</p>
+<p>The experiments in <span id="id7">[<a class="reference internal" href="references.html#id9" title="Marius Mosbach, Maksym Andriushchenko, and Dietrich Klakow. On the Stability of Fine-tuning BERT: Misconceptions, Explanations, and Strong Baselines. arXiv:2006.04884 [cs, stat], March 2021. arXiv: 2006.04884. URL: http://arxiv.org/abs/2006.04884 (visited on 2022-04-11).">MAK21</a>]</span> also demonstrate the severity of the fine-tuning instability, with numeous <em>failed fine-tuning runs</em>, where the fine-tuning model does no better than the majority class (i.e. random guessing) (e.g. Figure 5 of <span id="id8">[<a class="reference internal" href="references.html#id9" title="Marius Mosbach, Maksym Andriushchenko, and Dietrich Klakow. On the Stability of Fine-tuning BERT: Misconceptions, Explanations, and Strong Baselines. arXiv:2006.04884 [cs, stat], March 2021. arXiv: 2006.04884. URL: http://arxiv.org/abs/2006.04884 (visited on 2022-04-11).">MAK21</a>]</span>).</p>
+<p>Concurrently, <span id="id9">[<a class="reference internal" href="references.html#id9" title="Marius Mosbach, Maksym Andriushchenko, and Dietrich Klakow. On the Stability of Fine-tuning BERT: Misconceptions, Explanations, and Strong Baselines. arXiv:2006.04884 [cs, stat], March 2021. arXiv: 2006.04884. URL: http://arxiv.org/abs/2006.04884 (visited on 2022-04-11).">MAK21</a>]</span> and <span id="id10">[<a class="reference internal" href="references.html#id2" title="Tianyi Zhang, Felix Wu, Arzoo Katiyar, Kilian Q. Weinberger, and Yoav Artzi. Revisiting Few-sample BERT Fine-tuning. In Proceedings of the 9th International Conference on Learning Representations (ICLR 2021). February 2022. URL: https://openreview.net/forum?id=cO1IH43yUF (visited on 2022-07-30).">ZWK+22</a>]</span> observed that fine-tuning stability could be greatly improved over the original BERT version by adding bias correction to the Adam optimizer. Nevertheless, considerable instability still remained (see e.g. Figure 5 of <span id="id11">[<a class="reference internal" href="references.html#id9" title="Marius Mosbach, Maksym Andriushchenko, and Dietrich Klakow. On the Stability of Fine-tuning BERT: Misconceptions, Explanations, and Strong Baselines. arXiv:2006.04884 [cs, stat], March 2021. arXiv: 2006.04884. URL: http://arxiv.org/abs/2006.04884 (visited on 2022-04-11).">MAK21</a>]</span>).</p>
+<section id="reporting-sota-results">
+<h3>Reporting SOTA Results<a class="headerlink" href="#reporting-sota-results" title="Permalink to this headline">#</a></h3>
+<p>Reading some recent papers on the subject gave the false impression that fine-tuning instability is no longer an issue. For example, <span id="id12">[<a class="reference internal" href="references.html#id4" title="Haoming Jiang, Pengcheng He, Weizhu Chen, Xiaodong Liu, Jianfeng Gao, and Tuo Zhao. SMART: Robust and Efficient Fine-Tuning for Pre-trained Natural Language Models through Principled Regularized Optimization. In Proceedings of the 58th Annual Meeting of the Association for Computational Linguistics,, 2177–2190. April 2020. URL: https://www.microsoft.com/en-us/research/publication/smart-robust-and-efficient-fine-tuning-for-pre-trained-natural-language-models-through-principled-regularized-optimization/ (visited on 2022-04-23).">JHC+20</a>]</span> introduces a new method to improve fine-tuning stability and then presents their results as though the stability had been vanquished. The performance of various fine-tuning tasks are reported for a single fine-tuning run and then numerous comparisons are made to results reported in the literature, and state of the art (SOTA) results are claimed. The performance metrics are random variables, in particular due to the variance introduced by the two random seeds, and it does not make sense to report them as if their are numerical constants. Nevertheless, this practice is common in ML literature.</p>
+<p><span id="id13">[<a class="reference internal" href="references.html#id5" title="Hang Hua, Xingjian Li, Dejing Dou, Cheng-Zhong Xu, and Jiebo Luo. Noise Stability Regularization for Improving BERT Fine-tuning. In Proceedings of the 2021 Conference of the North American Chapter of the Association for Computational Linguistics, 3229–3241. July 2021. arXiv: 2107.04835. URL: https://aclanthology.org/2020.acl-main.197.pdf (visited on 2022-04-23).">HLD+21</a>]</span> introduces a new method to stablize BERT fine-tuning, and then gives a comparison with other such methods, including <span id="id14">[<a class="reference internal" href="references.html#id4" title="Haoming Jiang, Pengcheng He, Weizhu Chen, Xiaodong Liu, Jianfeng Gao, and Tuo Zhao. SMART: Robust and Efficient Fine-Tuning for Pre-trained Natural Language Models through Principled Regularized Optimization. In Proceedings of the 58th Annual Meeting of the Association for Computational Linguistics,, 2177–2190. April 2020. URL: https://www.microsoft.com/en-us/research/publication/smart-robust-and-efficient-fine-tuning-for-pre-trained-natural-language-models-through-principled-regularized-optimization/ (visited on 2022-04-23).">JHC+20</a>]</span>, where summary statistics, most relevantly standard deviation, are tabulated over fine-tuning runs with 25 different random seeds. This gives a proper comparison of the stability of the various fine-tuning methods. Incremental improvements have been made, but the instability issue remains.</p>
+</section>
+</section>
+<section id="catastrophic-forgetting">
+<span id="cf"></span><h2>Catastrophic Forgetting<a class="headerlink" href="#catastrophic-forgetting" title="Permalink to this headline">#</a></h2>
+<p>The most blatant form of instability in the context of fine-tuning is perhaps <em>catastrophic forgetting</em>.
+Catastrophic forgetting, originally identified in the context of continual learning (<span id="id15">[<a class="reference internal" href="references.html#id11" title="James Kirkpatrick, Razvan Pascanu, Neil Rabinowitz, Joel Veness, Guillaume Desjardins, Andrei A. Rusu, Kieran Milan, John Quan, Tiago Ramalho, Agnieszka Grabska-Barwinska, Demis Hassabis, Claudia Clopath, Dharshan Kumaran, and Raia Hadsell. Overcoming catastrophic forgetting in neural networks. Proceedings of the National Academy of Sciences, 114(13):3521–3526, March 2017. URL: https://pnas.org/doi/full/10.1073/pnas.1611835114 (visited on 2022-07-18), doi:10.1073/pnas.1611835114.">KPR+17</a>, <a class="reference internal" href="references.html#id12" title="Michael McCloskey and Neal J. Cohen. Catastrophic Interference in Connectionist Networks: The Sequential Learning Problem. In Psychology of Learning and Motivation, volume 24, pages 109–165. Elsevier, 1989. URL: https://linkinghub.elsevier.com/retrieve/pii/S0079742108605368 (visited on 2022-07-18), doi:10.1016/S0079-7421(08)60536-8.">MC89</a>]</span>) refers to the phenomenon where a model, trained sequentially on two different tasks, forgets how to perform the first task upon learning the second task.
+In the context of fine-tuning the pre-trained language model (PLM) loses its ability to perform the pre-training task during the fine-tuning process. However, when fine-tuning, catastrophic forgetting of the pre-training task typically, but not necessarily, results in a failed fine-tuning run, and hence is truly “catastrophic” because the model fails to learn the downstream task. Conversely, failed fine-tuning runs are typically, but not necessarily, accompanied by catastrophic forgetting.</p>
+<p>Catastrophic forgetting is an interesting phenomena in its own right. We had planned to investiage on our own, but first we would like to understand if this remains a prevalent issue with fine-tuning.</p>
+</section>
+<section id="albert">
+<h2>ALBERT<a class="headerlink" href="#albert" title="Permalink to this headline">#</a></h2>
+<p>We focus here on the  ALBERT (<span id="id16">[<a class="reference internal" href="references.html#id3" title="Zhenzhong Lan, Mingda Chen, Sebastian Goodman, Kevin Gimpel, Piyush Sharma, and Radu Soricut. ALBERT: A Lite BERT for Self-supervised Learning of Language Representations. In Proceedings of the 8th International Conference on Learning Representations (ICLR 2020). September 2019. URL: https://openreview.net/forum?id=H1eA7AEtvS (visited on 2022-04-23).">LCG+19</a>]</span>) instantiation of BERT. ALBERT (A Lite BERT for Self-supervised Learning of Language Representations) uses weight-sharing between all of its transformer layers, as a result of which it has about 18 times less parameters than BERT. It also takes roughly half the time to fine-tune.</p>
+<p>ALBERT was chosen here for very practical reasons. The space savings are substantial for fine-tuning experiments
+where the checkpoints from numerous fine-tuning runs need to saved. These were easily able to fit in the 2TB of cloud storage we had, whereas it was not nearly enough to store the larger BERT models. Obviously this can be important for real-world applications as well as research.</p>
+<p>Since failed fine-tuning runs and catastrophic forgetting usually occur together, we will just focus on failed fine-tuning since they are almost trivial to detect by definition. First we would like to reproduce some of the results from <span id="id17">[<a class="reference internal" href="references.html#id9" title="Marius Mosbach, Maksym Andriushchenko, and Dietrich Klakow. On the Stability of Fine-tuning BERT: Misconceptions, Explanations, and Strong Baselines. arXiv:2006.04884 [cs, stat], March 2021. arXiv: 2006.04884. URL: http://arxiv.org/abs/2006.04884 (visited on 2022-04-11).">MAK21</a>]</span> for the ALBERT model. We use the exact same hyperparameters. Importantly, we use the same learning rate schedule, which is linear decay with a 10% warmup. The warmup keeps the learning rate small at the very start of the fine-tuning which we confirmed (not shown here) helps avoid failed runs.</p>
+</section>
+<section id="fine-tuning-data">
+<h2>Fine-Tuning Data<a class="headerlink" href="#fine-tuning-data" title="Permalink to this headline">#</a></h2>
+<p>GLUE is one the most widely used English NLP benchmarks (<span id="id18">[<a class="reference internal" href="references.html#id16" title="Alex Wang, Amanpreet Singh, Julian Michael, Felix Hill, Omer Levy, and Samuel R. Bowman. GLUE: A Multi-Task Benchmark and Analysis Platform for Natural Language Understanding. In Proceedings of the 7th International Conference on Learning Representations (ICLR 2019). February 2019. URL: https://openreview.net/forum?id=rJ4km2R5t7 (visited on 2022-09-01).">WSM+19</a>]</span>). In this post, we just focus on the Recognizing Textual Entailment (RTE) dataset. It constains examples constructed based on news and Wikipedia text. Each sample contains a pair of sentences which is classified according to whether or not the first sentence entails the second one. Give example:</p>
+<p>RTE was chosen here because it is the second smallest dataset in GLUE, and has been observed to be particularly unstable when used for fine-tuning (e.g. <span id="id19">[<a class="reference internal" href="references.html#id9" title="Marius Mosbach, Maksym Andriushchenko, and Dietrich Klakow. On the Stability of Fine-tuning BERT: Misconceptions, Explanations, and Strong Baselines. arXiv:2006.04884 [cs, stat], March 2021. arXiv: 2006.04884. URL: http://arxiv.org/abs/2006.04884 (visited on 2022-04-11).">MAK21</a>]</span>).</p>
+</section>
+<section id="experiments">
+<h2>Experiments<a class="headerlink" href="#experiments" title="Permalink to this headline">#</a></h2>
+<p>Our experiments were done with the same settings as in <span id="id20">[<a class="reference internal" href="references.html#id9" title="Marius Mosbach, Maksym Andriushchenko, and Dietrich Klakow. On the Stability of Fine-tuning BERT: Misconceptions, Explanations, and Strong Baselines. arXiv:2006.04884 [cs, stat], March 2021. arXiv: 2006.04884. URL: http://arxiv.org/abs/2006.04884 (visited on 2022-04-11).">MAK21</a>]</span> for ALBERT: Fine-tuning is done using the Adam optimizer, with bias correction, linear warmup with warmup ratio 0.1, batch size 16, Adam <span class="math notranslate nohighlight">\(\epsilon\)</span>, <span class="math notranslate nohighlight">\(\beta_1\)</span> and <span class="math notranslate nohighlight">\(\beta_2\)</span> equal to <span class="math notranslate nohighlight">\(1e^{-6}\)</span>, <span class="math notranslate nohighlight">\(0.9\)</span> and <span class="math notranslate nohighlight">\(0.999\)</span>, respectively and gradient <span class="math notranslate nohighlight">\(L^2\)</span>-norm clipped at <span class="math notranslate nohighlight">\(1.0\)</span>. A sample script with these settings can be found in this project’s <a class="reference external" href="https://github.com/quantitative-technologies/fine-tuning-instability">repository</a>.</p>
+<section id="seeding">
+<h3>Seeding<a class="headerlink" href="#seeding" title="Permalink to this headline">#</a></h3>
+<p>We investigated the stability of the fine-tuning process with respect to the random model head initialization (not shown here). It was found that the random seed used for initialization of the classification layer affected the fine-tuning stability, with respect to the other source of randomness from the data ordering. We found that some initializions had low fine-tuning variance and few failed fine-tuning runs, the “good seeds”, while some initializations or “bad seeds” result in particularly poor fine-tuning performance.</p>
+<p>It turns out that this property has been observed before, e.g. in <span id="id21">[<a class="reference internal" href="references.html#id7" title="Yue Yu, Simiao Zuo, Haoming Jiang, Wendi Ren, Tuo Zhao, and Chao Zhang. Fine-Tuning Pre-trained Language Model with Weak Supervision: A Contrastive-Regularized Self-Training Approach. arXiv:2010.07835 [cs], March 2021. arXiv: 2010.07835. URL: http://arxiv.org/abs/2010.07835 (visited on 2022-04-23).">YZJ+21</a>]</span>. Understanding the properties of good initializations seems to be a promising line of research for achieve stable fine-tuning.</p>
+<p>In <span id="id22">[<a class="reference internal" href="references.html#id9" title="Marius Mosbach, Maksym Andriushchenko, and Dietrich Klakow. On the Stability of Fine-tuning BERT: Misconceptions, Explanations, and Strong Baselines. arXiv:2006.04884 [cs, stat], March 2021. arXiv: 2006.04884. URL: http://arxiv.org/abs/2006.04884 (visited on 2022-04-11).">MAK21</a>]</span> the two sources of randomness are not distinguished. Though we did not examine their code, which was provided with the paper, we that both sources of randomness were varied with each fine-tuning run in their research. Here, we chose a bad seed: 10013 for the model initialization <a class="footnote-reference brackets" href="#badseed" id="id23">1</a>, to skew the results towards instability, while the data shuffle order is varied over each fine-tuning run. We did this since we are looking for the occurence of failed runs.</p>
+</section>
+<section id="short-runs">
+<span id="id24"></span><h3>Short Runs<a class="headerlink" href="#short-runs" title="Permalink to this headline">#</a></h3>
+<p>First we repeat the experiment reported in <span id="id25">[<a class="reference internal" href="references.html#id9" title="Marius Mosbach, Maksym Andriushchenko, and Dietrich Klakow. On the Stability of Fine-tuning BERT: Misconceptions, Explanations, and Strong Baselines. arXiv:2006.04884 [cs, stat], March 2021. arXiv: 2006.04884. URL: http://arxiv.org/abs/2006.04884 (visited on 2022-04-11).">MAK21</a>]</span>, Figure 5(c). ALBERT is fine-tuned on RTE for 3 epochs with varying learning rates.</p>
+<div class="cell tag_remove-input docutils container">
+<div class="cell_output docutils container">
+<div class="output text_html"><style type="text/css">
+</style>
+<table id="T_a53f3">
+  <caption>Accuracy (%) of ALBERT Fine-Tuned on RTE at 3 Epochs</caption>
+  <thead>
+    <tr>
+      <th class="index_name level0" >Learning Rate:</th>
+      <th id="T_a53f3_level0_col0" class="col_heading level0 col0" >1e-05</th>
+      <th id="T_a53f3_level0_col1" class="col_heading level0 col1" >2e-05</th>
+      <th id="T_a53f3_level0_col2" class="col_heading level0 col2" >3e-05</th>
+      <th id="T_a53f3_level0_col3" class="col_heading level0 col3" >4e-05</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th id="T_a53f3_level0_row0" class="row_heading level0 row0" >mean</th>
+      <td id="T_a53f3_row0_col0" class="data row0 col0" >65.0</td>
+      <td id="T_a53f3_row0_col1" class="data row0 col1" >66.1</td>
+      <td id="T_a53f3_row0_col2" class="data row0 col2" >66.8</td>
+      <td id="T_a53f3_row0_col3" class="data row0 col3" >67.1</td>
+    </tr>
+    <tr>
+      <th id="T_a53f3_level0_row1" class="row_heading level0 row1" >std</th>
+      <td id="T_a53f3_row1_col0" class="data row1 col0" >2.5</td>
+      <td id="T_a53f3_row1_col1" class="data row1 col1" >6.5</td>
+      <td id="T_a53f3_row1_col2" class="data row1 col2" >8.8</td>
+      <td id="T_a53f3_row1_col3" class="data row1 col3" >9.4</td>
+    </tr>
+    <tr>
+      <th id="T_a53f3_level0_row2" class="row_heading level0 row2" >min</th>
+      <td id="T_a53f3_row2_col0" class="data row2 col0" >59.9</td>
+      <td id="T_a53f3_row2_col1" class="data row2 col1" >45.5</td>
+      <td id="T_a53f3_row2_col2" class="data row2 col2" >46.9</td>
+      <td id="T_a53f3_row2_col3" class="data row2 col3" >47.7</td>
+    </tr>
+    <tr>
+      <th id="T_a53f3_level0_row3" class="row_heading level0 row3" >max</th>
+      <td id="T_a53f3_row3_col0" class="data row3 col0" >69.3</td>
+      <td id="T_a53f3_row3_col1" class="data row3 col1" >73.6</td>
+      <td id="T_a53f3_row3_col2" class="data row3 col2" >76.5</td>
+      <td id="T_a53f3_row3_col3" class="data row3 col3" >79.1</td>
+    </tr>
+  </tbody>
+</table>
+</div></div>
+</div>
+<div class="cell tag_remove-input docutils container">
+<div class="cell_output docutils container">
+<img alt="_images/instability_8_0.png" src="_images/instability_8_0.png" />
+</div>
+</div>
+<p>In our resuls we see a trade-off between accuracy and stability, with the best and average accuracy increasing with the learning rate but also the instability is increasing as well, as indicated by the standard deviation. We see some similarities to the results in <span id="id26">[<a class="reference internal" href="references.html#id9" title="Marius Mosbach, Maksym Andriushchenko, and Dietrich Klakow. On the Stability of Fine-tuning BERT: Misconceptions, Explanations, and Strong Baselines. arXiv:2006.04884 [cs, stat], March 2021. arXiv: 2006.04884. URL: http://arxiv.org/abs/2006.04884 (visited on 2022-04-11).">MAK21</a>]</span>, but less failed runs in our experiments than theirs on the one hand, but lower maximum accuracy than reported there. It is possible that our different seeding procedure lowered the accuracy of the resulting fine-tuned models but we did not confirm.<a class="footnote-reference brackets" href="#noise-stability-paper" id="id27">2</a></p>
+<p>Moreover, increasing the learning rate also increases the number of failed fine-tuning runs:</p>
+<div class="cell tag_remove-input docutils container">
+<div class="cell_output docutils container">
+<div class="output text_html"><style type="text/css">
+</style>
+<table id="T_1ee7e">
+  <caption># of Failed Fine-Tuning Runs of ALBERT on RTE at 3 Epochs</caption>
+  <thead>
+    <tr>
+      <th class="index_name level0" >Learning Rate:</th>
+      <th id="T_1ee7e_level0_col0" class="col_heading level0 col0" >1e-05</th>
+      <th id="T_1ee7e_level0_col1" class="col_heading level0 col1" >2e-05</th>
+      <th id="T_1ee7e_level0_col2" class="col_heading level0 col2" >3e-05</th>
+      <th id="T_1ee7e_level0_col3" class="col_heading level0 col3" >4e-05</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th id="T_1ee7e_level0_row0" class="row_heading level0 row0" >Failed Runs</th>
+      <td id="T_1ee7e_row0_col0" class="data row0 col0" >0</td>
+      <td id="T_1ee7e_row0_col1" class="data row0 col1" >5</td>
+      <td id="T_1ee7e_row0_col2" class="data row0 col2" >6</td>
+      <td id="T_1ee7e_row0_col3" class="data row0 col3" >8</td>
+    </tr>
+  </tbody>
+</table>
+</div></div>
+</div>
+<p>By plotting the training/validation accuracy and loss metrics over each fine-tuning epoch we can easily spot the five failed runs for learning rate <span class="math notranslate nohighlight">\(\alpha=2e^{-5}\)</span> (click on the graph to enlarge).</p>
+<div class="full-width docutils">
+<a class="reference internal image-reference" href="_images/results.short_run.lr2e-5.png"><img alt="_images/results.short_run.lr2e-5.png" src="_images/results.short_run.lr2e-5.png" style="width: 100%;" /></a>
+</div>
+<section id="hyperparameter-and-model-selection">
+<h4>Hyperparameter and Model Selection<a class="headerlink" href="#hyperparameter-and-model-selection" title="Permalink to this headline">#</a></h4>
+<p>In practice it is not obvious how one would apply the results here on accuracy and failed runs for hyperparameter and model selection. It would depend on the utility of the specific application. At one extreme, there may only be enough compute resources for a single fine-tuning run for a mission critical application. In this (on the basis of the above results) the learning rate <span class="math notranslate nohighlight">\(\alpha=1e^{-5}\)</span> would be used to fine-tune a single model selected for production, since the top priority would be avoiding a failed run.</p>
+<p>At the other extreme, a large number <span class="math notranslate nohighlight">\(n\)</span> of fine-tuning runs might be allowed with the goal of finding the best performing fine-tuned model. In this case <span class="math notranslate nohighlight">\(\alpha=4e^{-5}\)</span> would be preferred as it showed the highest maximum accuracy in the above experiment. Of course the expected performance on some unseen test set would be lower than the maximum validation accuracy observed on the development set due to data mining bias. The paper <span id="id28">[<a class="reference internal" href="references.html#id13" title="Jesse Dodge, Suchin Gururangan, Dallas Card, Roy Schwartz, and Noah A. Smith. Show Your Work: Improved Reporting of Experimental Results. In Proceedings of the 2019 Conference on Empirical Methods in Natural Language Processing and the 9th International Joint Conference on Natural Language Processing (EMNLP-IJCNLP), 2185–2194. Hong Kong, China, November 2019. Association for Computational Linguistics. URL: https://aclanthology.org/D19-1224 (visited on 2022-08-10), doi:10.18653/v1/D19-1224.">DGC+19</a>]</span> deals with estimating the performance.</p>
+</section>
+</section>
+<section id="long-runs">
+<span id="id29"></span><h3>Long Runs<a class="headerlink" href="#long-runs" title="Permalink to this headline">#</a></h3>
+<p><span id="id30">[<a class="reference internal" href="references.html#id9" title="Marius Mosbach, Maksym Andriushchenko, and Dietrich Klakow. On the Stability of Fine-tuning BERT: Misconceptions, Explanations, and Strong Baselines. arXiv:2006.04884 [cs, stat], March 2021. arXiv: 2006.04884. URL: http://arxiv.org/abs/2006.04884 (visited on 2022-04-11).">MAK21</a>]</span> proposes a fine-tuning strategy which they claim to be a “hard to beat” baseline. The strategy is simply to use the hyperparameters indicated above, with <span class="math notranslate nohighlight">\(\alpha=2e^{-5}\)</span>, but to now fine-tune for 20 epochs. This strategy is based on their findings that overfitting is not an issue with fine-tuning, even as the training loss approaches zero.</p>
+<p>We attempt to reproduce their results, but also evaluate the claim that their fine-tuning strategy is hard to beat. Again we are particularly interested in whether or not failed runs can be avoided. However, we cannot directly compare to their results as they fine-tuned BERT, while here we are fine-tuning ALBERT.</p>
+<p>Below are the results of fine-tuning for 20 epochs at varying learning rates, where <code class="docutils literal notranslate"><span class="pre">max</span> <span class="pre">path</span></code> is the maximum over all 40 fine-tuning runs, over <em>all</em> epochs.</p>
+<div class="cell tag_remove-input docutils container">
+</div>
+<div class="cell tag_remove-input docutils container">
+</div>
+<p>We can see some of the trade off as before, with decreasing stability but higher mean/max accuracy increasing the learning rate <span class="math notranslate nohighlight">\(\alpha\)</span>, but now increasing beyond <span class="math notranslate nohighlight">\(\alpha=3e^{-5}\)</span> shows no improvement.</p>
+<div class="cell tag_remove-input docutils container">
+</div>
+<div class="cell tag_remove-input docutils container">
+</div>
+<p>Using the recommended fine-tuning strategy there was still one failed fine-tuning run. On the other hand, as with the short runs, we were able to avoid failed fine-tuning by setting <span class="math notranslate nohighlight">\(\alpha=1e^{-5}\)</span>. We also see fewer failed runs with the long runs, which is likely explained by the longer warmup period (10% of the total epochs).</p>
+<section id="accuracy-vs-epoch-plot">
+<span id="long-run-plot"></span><h4>Accuracy vs Epoch Plot<a class="headerlink" href="#accuracy-vs-epoch-plot" title="Permalink to this headline">#</a></h4>
+<p>Next we examine the accuracy versus epoch plots for the case <span class="math notranslate nohighlight">\(\alpha=3e^{-5}\)</span> (clickable).</p>
+<div class="full-width docutils">
+<a class="reference internal image-reference" href="_images/results.long_run.lr3e-5.png"><img alt="_images/results.long_run.lr3e-5.png" src="_images/results.long_run.lr3e-5.png" style="width: 100%;" /></a>
+</div>
+<p>Based on visual inspection, there is little evidence of overfitting, in agreement with <span id="id31">[<a class="reference internal" href="references.html#id9" title="Marius Mosbach, Maksym Andriushchenko, and Dietrich Klakow. On the Stability of Fine-tuning BERT: Misconceptions, Explanations, and Strong Baselines. arXiv:2006.04884 [cs, stat], March 2021. arXiv: 2006.04884. URL: http://arxiv.org/abs/2006.04884 (visited on 2022-04-11).">MAK21</a>]</span>.</p>
+<p>The failed run is observed for shuffle seed 20004. Another interesting phenomenon is seen at seed: 20039. It be begins as a failed run, but after 9 epochs the model starts learning; however, the performance remains poor and could also reasonably be classified as a failed run. In fact, after a single epoch of fine-tuning the models usually have poor but better than random accuracy (see e.g. seed: 20004).</p>
+<p>Fine-tuning with learning rate <span class="math notranslate nohighlight">\(\alpha=1e^{-5}\)</span> is very stable. Looking at the losses versus epochs plot does not appear interesting:</p>
+<div class="full-width docutils">
+<a class="reference internal image-reference" href="_images/results.long_run.loss.lr3e-5.png"><img alt="_images/results.long_run.loss.lr3e-5.png" src="_images/results.long_run.loss.lr3e-5.png" style="width: 100%;" /></a>
+</div>
+<p>We can observe though that the training loss does converge to zero, even at the smallest learning rate.</p>
+</section>
+</section>
+<section id="very-long-runs">
+<h3>Very Long Runs<a class="headerlink" href="#very-long-runs" title="Permalink to this headline">#</a></h3>
+<p>Based on the apparent observation that overfitting is not an issue with fine-tuning, it follows that training longer is better. We try training for 100 epochs, with the most stable setting of <span class="math notranslate nohighlight">\(\alpha=1e^{-5}\)</span>.</p>
+<div class="full-width docutils">
+<a class="reference internal image-reference" href="_images/results.very_long_run.lr1e-5.png"><img alt="_images/results.very_long_run.lr1e-5.png" src="_images/results.very_long_run.lr1e-5.png" style="width: 100%;" /></a>
+</div>
+<p>The fine-tuning process soon stops learning, with the maximum accuracy of % achieved at epoch . This is not surprising considering we saw that the training loss goes near zero within 20 epochs.</p>
+<hr class="footnotes docutils" />
+<dl class="footnote brackets">
+<dt class="label" id="badseed"><span class="brackets"><a class="fn-backref" href="#id23">1</a></span></dt>
+<dd><p>This was not done precisely. For example, when initialization seeds were being compared, different hyperparameters were used than for the present experiments. We also did not try other initialization seeds here for comparison.</p>
+</dd>
+<dt class="label" id="noise-stability-paper"><span class="brackets"><a class="fn-backref" href="#id27">2</a></span></dt>
+<dd><p>We can also compare to short run results reported in <span id="id32">[<a class="reference internal" href="references.html#id5" title="Hang Hua, Xingjian Li, Dejing Dou, Cheng-Zhong Xu, and Jiebo Luo. Noise Stability Regularization for Improving BERT Fine-tuning. In Proceedings of the 2021 Conference of the North American Chapter of the Association for Computational Linguistics, 3229–3241. July 2021. arXiv: 2107.04835. URL: https://aclanthology.org/2020.acl-main.197.pdf (visited on 2022-04-23).">HLD+21</a>]</span>, Table 2. They report considerably better stability and also better mean accuracy but lower maximum accuracy than ours. This is cause for skepticism, because they also state (<span id="id33">[<a class="reference internal" href="references.html#id5" title="Hang Hua, Xingjian Li, Dejing Dou, Cheng-Zhong Xu, and Jiebo Luo. Noise Stability Regularization for Improving BERT Fine-tuning. In Proceedings of the 2021 Conference of the North American Chapter of the Association for Computational Linguistics, 3229–3241. July 2021. arXiv: 2107.04835. URL: https://aclanthology.org/2020.acl-main.197.pdf (visited on 2022-04-23).">HLD+21</a>]</span>, <span class="math notranslate nohighlight">\(\S\)</span>4.3) that they use Adam <em>without</em> bias correction, which by previously reported results should be much less stable (c.f. <a class="reference internal" href="#current-state"><span class="std std-ref">Current State of Instability for Fine-Tuning LLMs</span></a>).</p>
+</dd>
+</dl>
+</section>
+</section>
+</section>
+
+    <script type="text/x-thebe-config">
+    {
+        requestKernel: true,
+        binderOptions: {
+            repo: "binder-examples/jupyter-stacks-datascience",
+            ref: "master",
+        },
+        codeMirrorConfig: {
+            theme: "abcdef",
+            mode: "python"
+        },
+        kernelOptions: {
+            kernelName: "python3",
+            path: "./."
+        },
+        predefinedOutput: true
+    }
+    </script>
+    <script>kernelName = 'python3'</script>
+
+              </div>
+              
+            </main>
+            <footer class="footer-article noprint">
+                
+    <!-- Previous / next buttons -->
+<div class='prev-next-area'>
+    <a class='left-prev' id="prev-link" href="intro.html" title="previous page">
+        <i class="fas fa-angle-left"></i>
+        <div class="prev-next-info">
+            <p class="prev-next-subtitle">previous</p>
+            <p class="prev-next-title">Overview</p>
+        </div>
+    </a>
+    <a class='right-next' id="next-link" href="l2sp_regularization.html" title="next page">
+    <div class="prev-next-info">
+        <p class="prev-next-subtitle">next</p>
+        <p class="prev-next-title"><span class="math notranslate nohighlight">\(\ltsp\)</span> Regularization</p>
+    </div>
+    <i class="fas fa-angle-right"></i>
+    </a>
+</div>
+            </footer>
+        </div>
+    </div>
+    <div class="footer-content row">
+        <footer class="col footer"><p>
+  
+    By James Hirschorn<br/>
+  
+      &copy; Copyright 2022.<br/>
+    <div class="extra_footer">
+      <a href="https://quantitative-technologies.com/" style="font-size:150%;">
+  <b>Quantitative Technologies</b>
+</a>
+
+    </div>
+</p>
+        </footer>
+    </div>
+    
+</div>
+
+
+      </div>
+    </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script src="_static/scripts/pydata-sphinx-theme.js?digest=1999514e3f237ded88cf"></script>
+
+
+  </body>
+</html>
