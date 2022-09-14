@@ -26,6 +26,7 @@
     <link rel="stylesheet" type="text/css" href="_static/copybutton.css" />
     <link rel="stylesheet" type="text/css" href="_static/mystnb.css" />
     <link rel="stylesheet" type="text/css" href="_static/sphinx-thebe.css" />
+    <link rel="stylesheet" type="text/css" href="_static/custom.css" />
     <link rel="stylesheet" type="text/css" href="_static/design-style.b7bb847fb20b106c3d81b95245e65545.min.css" />
     
   <!-- Pre-loaded scripts that we'll load fully later -->
@@ -54,7 +55,7 @@ const thebe_selector_output = ".output, .cell_output"
     <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
-    <link rel="next" title="Conculsions" href="conclusion.html" />
+    <link rel="next" title="Conclusions" href="conclusion.html" />
     <link rel="prev" title="Fine-Tuning Instability" href="instability.html" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="docsearch:language" content="None">
@@ -118,7 +119,7 @@ const thebe_selector_output = ".output, .cell_output"
  </li>
  <li class="toctree-l1">
   <a class="reference internal" href="conclusion.html">
-   Conculsions
+   Conclusions
   </a>
  </li>
  <li class="toctree-l1">
@@ -134,7 +135,7 @@ const thebe_selector_output = ".output, .cell_output"
              <!-- To handle the deprecated key -->
             
             <div class="navbar_extra_footer">
-            <a href="https://quantitative-technologies.com/" style="font-size:150%;">
+            <a href="https://quantitative-technologies.com/posts/data-science/" style="font-size:150%;">
   <b>Quantitative Technologies</b>
 </a>
 
@@ -395,8 +396,8 @@ title="Open an issue"
 </div>
 <section class="tex2jax_ignore mathjax_ignore" id="ltsp-regularization">
 <h1><span class="math notranslate nohighlight">\(\ltsp\)</span> Regularization<a class="headerlink" href="#ltsp-regularization" title="Permalink to this headline">#</a></h1>
-<p>Since the advent of BERT, various techniques have been developed or utilized to stabilize the fine-tuning process (as discussed in <a class="reference internal" href="instability.html#current-state"><span class="std std-ref">Current State of Instability for Fine-Tuning LLMs</span></a>). We investigate one of these methods, <span class="math notranslate nohighlight">\(\ltsp\)</span> regularization, introduced in <span id="id1">[<a class="reference internal" href="references.html#id14" title="Xuhong Li, Yves Grandvalet, and Franck Davoine. Explicit Inductive Bias for Transfer Learning with Convolutional Networks. In Proceedings of the 35th International Conference on Machine Learning, 2825–2834. PMLR, July 2018. URL: https://proceedings.mlr.press/v80/li18a.html (visited on 2022-07-30).">LGD18</a>]</span> for the purpose of fine-tuning computer vision models, and used as one of the baseline methods in <span id="id2">[<a class="reference internal" href="references.html#id5" title="Hang Hua, Xingjian Li, Dejing Dou, Cheng-Zhong Xu, and Jiebo Luo. Noise Stability Regularization for Improving BERT Fine-tuning. In Proceedings of the 2021 Conference of the North American Chapter of the Association for Computational Linguistics, 3229–3241. July 2021. arXiv: 2107.04835. URL: https://aclanthology.org/2020.acl-main.197.pdf (visited on 2022-04-23).">HLD+21</a>]</span>. It is indicated in <span id="id3">[<a class="reference internal" href="references.html#id14" title="Xuhong Li, Yves Grandvalet, and Franck Davoine. Explicit Inductive Bias for Transfer Learning with Convolutional Networks. In Proceedings of the 35th International Conference on Machine Learning, 2825–2834. PMLR, July 2018. URL: https://proceedings.mlr.press/v80/li18a.html (visited on 2022-07-30).">LGD18</a>]</span> that standard <span class="math notranslate nohighlight">\(\ltwo\)</span> regularization, which gives an inductive bias towards the origin, is inappropriate for transfer learning. Instead an inductive bias towards towards the starting point (<span class="math notranslate nohighlight">\(\sp\)</span>) from where the transfer learning (e.g. fine-tuning) begins, ostensibly preserves the knowledge from the pretrained model. It is reported in <span id="id4">[<a class="reference internal" href="references.html#id14" title="Xuhong Li, Yves Grandvalet, and Franck Davoine. Explicit Inductive Bias for Transfer Learning with Convolutional Networks. In Proceedings of the 35th International Conference on Machine Learning, 2825–2834. PMLR, July 2018. URL: https://proceedings.mlr.press/v80/li18a.html (visited on 2022-07-30).">LGD18</a>]</span> that <span class="math notranslate nohighlight">\(\ltsp\)</span> always outperforms <span class="math notranslate nohighlight">\(\ltwo\)</span> regularization, for fine-tuning deep convolutional networks for comptuer vision tasks, but unfortunately they do not compare with no regularization.</p>
-<p>The reason we found <span class="math notranslate nohighlight">\(\ltsp\)</span> to be be of particular interest is because, according to <span id="id5">[<a class="reference internal" href="references.html#id14" title="Xuhong Li, Yves Grandvalet, and Franck Davoine. Explicit Inductive Bias for Transfer Learning with Convolutional Networks. In Proceedings of the 35th International Conference on Machine Learning, 2825–2834. PMLR, July 2018. URL: https://proceedings.mlr.press/v80/li18a.html (visited on 2022-07-30).">LGD18</a>]</span>, it alleviates catastrophic forgetting—wheras they claim <span class="math notranslate nohighlight">\(\ltwo\)</span> regularization worsens catastrophic forgetting. This agreed with our observations on cases of catastrophic forgetting (not shown here) which were characterized by large shifts of the weight parameters from their pretrained values.</p>
+<p>Since the advent of BERT, various techniques have been developed or utilized to stabilize the fine-tuning process (as discussed in <a class="reference internal" href="instability.html#current-state"><span class="std std-ref">Current State of Instability for Fine-Tuning LLMs</span></a>). We investigate one of these methods, <span class="math notranslate nohighlight">\(\ltsp\)</span> regularization, introduced in <span id="id1">[<a class="reference internal" href="references.html#id14" title="Xuhong Li, Yves Grandvalet, and Franck Davoine. Explicit Inductive Bias for Transfer Learning with Convolutional Networks. In Proceedings of the 35th International Conference on Machine Learning, 2825–2834. PMLR, July 2018. URL: https://proceedings.mlr.press/v80/li18a.html (visited on 2022-07-30).">LGD18</a>]</span> for the purpose of fine-tuning computer vision models, and used as one of the baseline methods in <span id="id2">[<a class="reference internal" href="references.html#id5" title="Hang Hua, Xingjian Li, Dejing Dou, Cheng-Zhong Xu, and Jiebo Luo. Noise Stability Regularization for Improving BERT Fine-tuning. In Proceedings of the 2021 Conference of the North American Chapter of the Association for Computational Linguistics, 3229–3241. July 2021. arXiv: 2107.04835. URL: https://aclanthology.org/2020.acl-main.197.pdf (visited on 2022-04-23).">HLD+21</a>]</span>. It is indicated in <span id="id3">[<a class="reference internal" href="references.html#id14" title="Xuhong Li, Yves Grandvalet, and Franck Davoine. Explicit Inductive Bias for Transfer Learning with Convolutional Networks. In Proceedings of the 35th International Conference on Machine Learning, 2825–2834. PMLR, July 2018. URL: https://proceedings.mlr.press/v80/li18a.html (visited on 2022-07-30).">LGD18</a>]</span> that standard <span class="math notranslate nohighlight">\(\ltwo\)</span> regularization, which gives an inductive bias towards the origin, is inappropriate for transfer learning. Instead an inductive bias towards towards the starting point (<span class="math notranslate nohighlight">\(\sp\)</span>) from where the transfer learning (e.g. fine-tuning) begins, ostensibly preserves the knowledge from the pre-trained model. It is reported in <span id="id4">[<a class="reference internal" href="references.html#id14" title="Xuhong Li, Yves Grandvalet, and Franck Davoine. Explicit Inductive Bias for Transfer Learning with Convolutional Networks. In Proceedings of the 35th International Conference on Machine Learning, 2825–2834. PMLR, July 2018. URL: https://proceedings.mlr.press/v80/li18a.html (visited on 2022-07-30).">LGD18</a>]</span> that <span class="math notranslate nohighlight">\(\ltsp\)</span> always outperforms <span class="math notranslate nohighlight">\(\ltwo\)</span> regularization, for fine-tuning deep convolutional networks on computer vision tasks, but unfortunately they do not compare with no regularization.</p>
+<p>The reason we found <span class="math notranslate nohighlight">\(\ltsp\)</span> to be be of particular interest is because, according to <span id="id5">[<a class="reference internal" href="references.html#id14" title="Xuhong Li, Yves Grandvalet, and Franck Davoine. Explicit Inductive Bias for Transfer Learning with Convolutional Networks. In Proceedings of the 35th International Conference on Machine Learning, 2825–2834. PMLR, July 2018. URL: https://proceedings.mlr.press/v80/li18a.html (visited on 2022-07-30).">LGD18</a>]</span>, it alleviates catastrophic forgetting—whereas they claim <span class="math notranslate nohighlight">\(\ltwo\)</span> regularization worsens catastrophic forgetting. This agreed with our observations on cases of catastrophic forgetting (not shown here) which were characterized by large shifts of the weight parameters from their pre-trained values.</p>
 <p>Let <span class="math notranslate nohighlight">\(f_t(\theta)\)</span> be the <span class="math notranslate nohighlight">\(t\th\)</span>-batch loss as a function of the model weights <span class="math notranslate nohighlight">\(\theta\)</span>. Then <span class="math notranslate nohighlight">\(\ltwo\)</span> regularization involves minimizing the <em>penalized loss</em></p>
 <div class="math notranslate nohighlight" id="equation-l2-reg">
 <span class="eqno">(1)<a class="headerlink" href="#equation-l2-reg" title="Permalink to this equation">#</a></span>\[
@@ -404,8 +405,8 @@ f_t^{\ltwo}(\theta)=f_t(\theta)+\frac\lambda2\|\theta\|_2^2
 \]</div>
 <p>where <span class="math notranslate nohighlight">\(\lambda\)</span> is the <em>regularization penalty</em>. It penalizes large parameters with respect to the <span class="math notranslate nohighlight">\(\ltwo\)</span> norm, pushing them towards <span class="math notranslate nohighlight">\(0\)</span>.</p>
 <p>In <span class="math notranslate nohighlight">\(\ltsp\)</span> regularization, the distance from the starting point, rather than the origin, is penalized.
-However, in transfer learning the starting model architecture is usually modified for the purpose of learning the new task. For example, when fine-tuning, the last layer of the model—i.e. the model’s <em>head</em>—is typically replaced to learn a downstream task. In the case of our RTE task, the pretrained model’s head is replaced with a classification head which decides whether or not there is an implication between the first and second sentences.</p>
-<p>Let <span class="math notranslate nohighlight">\(\thetas\)</span> denote model parameters that are from the architecture (i.e. layers) shared with the source (pretrained) starting point model,
+However, in transfer learning the starting model architecture is usually modified for the purpose of learning the new task. For example, when fine-tuning, the last layer of the model—i.e. the model’s <em>head</em>—is typically replaced to learn some downstream task. In the case of our RTE task, the pre-trained model’s head is replaced with a classification head which decides whether or not there is an implication between the first and second sentences.</p>
+<p>Let <span class="math notranslate nohighlight">\(\thetas\)</span> denote model parameters that are from the architecture (i.e. layers) shared with the source starting point model,
 and let <span class="math notranslate nohighlight">\(\thetan\)</span> denote the remaining novel parameters (e.g. the fine-tuning head). <span class="math notranslate nohighlight">\(\ltsp\)</span> regularization uses the penalized loss</p>
 <div class="math notranslate nohighlight" id="equation-l2-sp-reg">
 <span class="eqno">(2)<a class="headerlink" href="#equation-l2-sp-reg" title="Permalink to this equation">#</a></span>\[
@@ -419,7 +420,7 @@ f_t^{\ltsp}(\theta)=f_t(\theta)+\frac{\lambda_1}2\|\thetas-\thetas_0\|_2^2+\frac
 \[
 g_t=\nabla f_t(\theta_t)
 \]</div>
-<p>denote the gradient of the <span class="math notranslate nohighlight">\(t\th\)</span>-batch. The gradient-based update with <em>exponential weight decay</em> with rate <span class="math notranslate nohighlight">\(\lambda\)</span> is given by</p>
+<p>denote the loss gradient of the <span class="math notranslate nohighlight">\(t\th\)</span>-batch. The gradient-based update with <em>exponential weight decay</em> with rate <span class="math notranslate nohighlight">\(\lambda\)</span> is given by</p>
 <div class="math notranslate nohighlight" id="equation-weight-decay">
 <span class="eqno">(3)<a class="headerlink" href="#equation-weight-decay" title="Permalink to this equation">#</a></span>\[
 \theta_{t+1}=(1-\lambda)\theta_t-\alpha g_t,
@@ -436,7 +437,7 @@ g_t=\nabla f_t(\theta_t)
 </section>
 <section id="adamwl2sp-adam-with-ltsp-weight-decay">
 <h2>AdamWL2SP: Adam with <span class="math notranslate nohighlight">\(\ltsp\)</span> Weight Decay<a class="headerlink" href="#adamwl2sp-adam-with-ltsp-weight-decay" title="Permalink to this headline">#</a></h2>
-<p><span id="id10">[<a class="reference internal" href="references.html#id5" title="Hang Hua, Xingjian Li, Dejing Dou, Cheng-Zhong Xu, and Jiebo Luo. Noise Stability Regularization for Improving BERT Fine-tuning. In Proceedings of the 2021 Conference of the North American Chapter of the Association for Computational Linguistics, 3229–3241. July 2021. arXiv: 2107.04835. URL: https://aclanthology.org/2020.acl-main.197.pdf (visited on 2022-04-23).">HLD+21</a>]</span> claim to have used <span class="math notranslate nohighlight">\(\ltsp\)</span> regularization as a baseline for improving the stability of BERT fine-tuning. They simply reference <span id="id11">[<a class="reference internal" href="references.html#id14" title="Xuhong Li, Yves Grandvalet, and Franck Davoine. Explicit Inductive Bias for Transfer Learning with Convolutional Networks. In Proceedings of the 35th International Conference on Machine Learning, 2825–2834. PMLR, July 2018. URL: https://proceedings.mlr.press/v80/li18a.html (visited on 2022-07-30).">LGD18</a>]</span> without giving further details on their implementation. Since they explicitly state that the Adam optimizer is used in their various experiments and provide the hyperparamer settings, we assumed that they meant adding some form of <span class="math notranslate nohighlight">\(\ltsp\)</span> regularization to the Adam optimizer. Perhaps, however, they simply used SGD with <span class="math notranslate nohighlight">\(\ltwo\)</span> regularization as in <span id="id12">[<a class="reference internal" href="references.html#id14" title="Xuhong Li, Yves Grandvalet, and Franck Davoine. Explicit Inductive Bias for Transfer Learning with Convolutional Networks. In Proceedings of the 35th International Conference on Machine Learning, 2825–2834. PMLR, July 2018. URL: https://proceedings.mlr.press/v80/li18a.html (visited on 2022-07-30).">LGD18</a>]</span>.</p>
+<p><span id="id10">[<a class="reference internal" href="references.html#id5" title="Hang Hua, Xingjian Li, Dejing Dou, Cheng-Zhong Xu, and Jiebo Luo. Noise Stability Regularization for Improving BERT Fine-tuning. In Proceedings of the 2021 Conference of the North American Chapter of the Association for Computational Linguistics, 3229–3241. July 2021. arXiv: 2107.04835. URL: https://aclanthology.org/2020.acl-main.197.pdf (visited on 2022-04-23).">HLD+21</a>]</span> claim to have used <span class="math notranslate nohighlight">\(\ltsp\)</span> regularization as a baseline for improving the stability of BERT fine-tuning. They simply reference <span id="id11">[<a class="reference internal" href="references.html#id14" title="Xuhong Li, Yves Grandvalet, and Franck Davoine. Explicit Inductive Bias for Transfer Learning with Convolutional Networks. In Proceedings of the 35th International Conference on Machine Learning, 2825–2834. PMLR, July 2018. URL: https://proceedings.mlr.press/v80/li18a.html (visited on 2022-07-30).">LGD18</a>]</span> without giving further details on their implementation. Since they explicitly state that the Adam optimizer is used in their various experiments and provide the hyperparameter settings, we assumed that they meant adding some form of <span class="math notranslate nohighlight">\(\ltsp\)</span> regularization to the Adam optimizer. Perhaps, however, they simply used SGD with <span class="math notranslate nohighlight">\(\ltwo\)</span> regularization as in <span id="id12">[<a class="reference internal" href="references.html#id14" title="Xuhong Li, Yves Grandvalet, and Franck Davoine. Explicit Inductive Bias for Transfer Learning with Convolutional Networks. In Proceedings of the 35th International Conference on Machine Learning, 2825–2834. PMLR, July 2018. URL: https://proceedings.mlr.press/v80/li18a.html (visited on 2022-07-30).">LGD18</a>]</span>.</p>
 <p>In <span class="math notranslate nohighlight">\(\ltsp\)</span> regularization, see equation <a class="reference internal" href="#equation-l2-sp-reg">(2)</a>, the distance of the weights from their initial values is being penalized. Thus the corresponding decoupled weight decay applies to the distance between current and initial weights. For the parameters <span class="math notranslate nohighlight">\(\thetas\)</span>, shared between the source and target models, the update is:</p>
 <div class="math notranslate nohighlight" id="equation-l2sp-weight-decay">
 <span class="eqno">(4)<a class="headerlink" href="#equation-l2sp-weight-decay" title="Permalink to this equation">#</a></span>\[\begin{split}
@@ -445,10 +446,15 @@ g_t=\nabla f_t(\theta_t)
 &amp;=(1-\lambda_1)\thetas_t + \lambda_1\thetas_0,
 \end{split}
 \end{split}\]</div>
-<p>while for the novel parameters this is just the <span class="math notranslate nohighlight">\(\ltwo\)</span> regularization version: <span class="math notranslate nohighlight">\(\thetan_{t+1}=(1-\lambda_2)\thetan_t\)</span>.</p>
+<p>while for the novel parameters this is just the <span class="math notranslate nohighlight">\(\ltwo\)</span> regularization version, i.e. exponential weight decay: <span class="math notranslate nohighlight">\(\thetan_{t+1}=(1-\lambda_2)\thetan_t\)</span>.</p>
 <section id="implementation">
 <h3>Implementation<a class="headerlink" href="#implementation" title="Permalink to this headline">#</a></h3>
 <p>Our implementation of <code class="docutils literal notranslate"><span class="pre">AdamWL2SP</span></code> is available in this project’s <a class="reference external" href="https://github.com/quantitative-technologies/fine-tuning-instability">repository</a>.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>The PyTorch <code class="docutils literal notranslate"><span class="pre">AdamW</span></code> follows the <code class="docutils literal notranslate"><span class="pre">SGD</span></code> optimizer, in that the hyperparameter <span class="math notranslate nohighlight">\(\lambda\)</span> is multiplied by the learning weight <span class="math notranslate nohighlight">\(\alpha\)</span> so that the actual weight decay is <span class="math notranslate nohighlight">\(\alpha\lambda\)</span>. In view of the fact that <code class="docutils literal notranslate"><span class="pre">AdamW</span></code> decouples the weight decay from the gradient update, it seems inappropriate to multiply <span class="math notranslate nohighlight">\(\lambda\)</span> by <span class="math notranslate nohighlight">\(\alpha\text{.}\)</span> On the other hand (we did not test this), it is conceivable that the best <span class="math notranslate nohighlight">\(\lambda\)</span> is inversely proportional to <span class="math notranslate nohighlight">\(\alpha\)</span> by some vestige connection with <code class="docutils literal notranslate"><span class="pre">SGD</span></code> where there is an equivalence with <span class="math notranslate nohighlight">\(L^2\)</span> regularization with penalty <span class="math notranslate nohighlight">\(\alpha\lambda\)</span>.</p>
+<p>We copied this convention in our implementation of <code class="docutils literal notranslate"><span class="pre">AdamWL2SP</span></code>, though we feel that using given <span class="math notranslate nohighlight">\(\lambda\)</span> as the actual weight decay may have been preferable.</p>
+</div>
 </section>
 <section id="experiments">
 <h3>Experiments<a class="headerlink" href="#experiments" title="Permalink to this headline">#</a></h3>
@@ -463,58 +469,58 @@ g_t=\nabla f_t(\theta_t)
 <div class="cell_output docutils container">
 <div class="output text_html"><style type="text/css">
 </style>
-<table id="T_ada3b">
+<table id="T_f9d67">
   <caption>Accuracy of ALBERT Fine-Tuned on RTE with AdamWL2SP for 3 Epochs at learning rate 4e-5</caption>
   <thead>
     <tr>
       <th class="index_name level0" >penalty:</th>
-      <th id="T_ada3b_level0_col0" class="col_heading level0 col0" >0</th>
-      <th id="T_ada3b_level0_col1" class="col_heading level0 col1" >2e-05</th>
-      <th id="T_ada3b_level0_col2" class="col_heading level0 col2" >0.0002</th>
-      <th id="T_ada3b_level0_col3" class="col_heading level0 col3" >0.002</th>
+      <th id="T_f9d67_level0_col0" class="col_heading level0 col0" >0</th>
+      <th id="T_f9d67_level0_col1" class="col_heading level0 col1" >2e-05</th>
+      <th id="T_f9d67_level0_col2" class="col_heading level0 col2" >0.0002</th>
+      <th id="T_f9d67_level0_col3" class="col_heading level0 col3" >0.002</th>
     </tr>
   </thead>
   <tbody>
     <tr>
-      <th id="T_ada3b_level0_row0" class="row_heading level0 row0" >mean</th>
-      <td id="T_ada3b_row0_col0" class="data row0 col0" >67.1%</td>
-      <td id="T_ada3b_row0_col1" class="data row0 col1" >64.9%</td>
-      <td id="T_ada3b_row0_col2" class="data row0 col2" >67.6%</td>
-      <td id="T_ada3b_row0_col3" class="data row0 col3" >67.5%</td>
+      <th id="T_f9d67_level0_row0" class="row_heading level0 row0" >mean</th>
+      <td id="T_f9d67_row0_col0" class="data row0 col0" >67.1%</td>
+      <td id="T_f9d67_row0_col1" class="data row0 col1" >64.9%</td>
+      <td id="T_f9d67_row0_col2" class="data row0 col2" >67.6%</td>
+      <td id="T_f9d67_row0_col3" class="data row0 col3" >67.5%</td>
     </tr>
     <tr>
-      <th id="T_ada3b_level0_row1" class="row_heading level0 row1" >std</th>
-      <td id="T_ada3b_row1_col0" class="data row1 col0" >9.4%</td>
-      <td id="T_ada3b_row1_col1" class="data row1 col1" >11.7%</td>
-      <td id="T_ada3b_row1_col2" class="data row1 col2" >9.3%</td>
-      <td id="T_ada3b_row1_col3" class="data row1 col3" >9.6%</td>
+      <th id="T_f9d67_level0_row1" class="row_heading level0 row1" >std</th>
+      <td id="T_f9d67_row1_col0" class="data row1 col0" >9.4%</td>
+      <td id="T_f9d67_row1_col1" class="data row1 col1" >11.7%</td>
+      <td id="T_f9d67_row1_col2" class="data row1 col2" >9.3%</td>
+      <td id="T_f9d67_row1_col3" class="data row1 col3" >9.6%</td>
     </tr>
     <tr>
-      <th id="T_ada3b_level0_row2" class="row_heading level0 row2" >min</th>
-      <td id="T_ada3b_row2_col0" class="data row2 col0" >47.7%</td>
-      <td id="T_ada3b_row2_col1" class="data row2 col1" >47.3%</td>
-      <td id="T_ada3b_row2_col2" class="data row2 col2" >44.8%</td>
-      <td id="T_ada3b_row2_col3" class="data row2 col3" >46.6%</td>
+      <th id="T_f9d67_level0_row2" class="row_heading level0 row2" >min</th>
+      <td id="T_f9d67_row2_col0" class="data row2 col0" >47.7%</td>
+      <td id="T_f9d67_row2_col1" class="data row2 col1" >47.3%</td>
+      <td id="T_f9d67_row2_col2" class="data row2 col2" >44.8%</td>
+      <td id="T_f9d67_row2_col3" class="data row2 col3" >46.6%</td>
     </tr>
     <tr>
-      <th id="T_ada3b_level0_row3" class="row_heading level0 row3" >max</th>
-      <td id="T_ada3b_row3_col0" class="data row3 col0" >79.1%</td>
-      <td id="T_ada3b_row3_col1" class="data row3 col1" >80.9%</td>
-      <td id="T_ada3b_row3_col2" class="data row3 col2" >78.0%</td>
-      <td id="T_ada3b_row3_col3" class="data row3 col3" >79.4%</td>
+      <th id="T_f9d67_level0_row3" class="row_heading level0 row3" >max</th>
+      <td id="T_f9d67_row3_col0" class="data row3 col0" >79.1%</td>
+      <td id="T_f9d67_row3_col1" class="data row3 col1" >80.9%</td>
+      <td id="T_f9d67_row3_col2" class="data row3 col2" >78.0%</td>
+      <td id="T_f9d67_row3_col3" class="data row3 col3" >79.4%</td>
     </tr>
     <tr>
-      <th id="T_ada3b_level0_row4" class="row_heading level0 row4" >failed runs</th>
-      <td id="T_ada3b_row4_col0" class="data row4 col0" >8</td>
-      <td id="T_ada3b_row4_col1" class="data row4 col1" >15</td>
-      <td id="T_ada3b_row4_col2" class="data row4 col2" >8</td>
-      <td id="T_ada3b_row4_col3" class="data row4 col3" >8</td>
+      <th id="T_f9d67_level0_row4" class="row_heading level0 row4" >failed runs</th>
+      <td id="T_f9d67_row4_col0" class="data row4 col0" >8</td>
+      <td id="T_f9d67_row4_col1" class="data row4 col1" >15</td>
+      <td id="T_f9d67_row4_col2" class="data row4 col2" >8</td>
+      <td id="T_f9d67_row4_col3" class="data row4 col3" >8</td>
     </tr>
   </tbody>
 </table>
 </div></div>
 </div>
-<p>Diappointingly, the summary statistics are not significantly different than without regularization, except for the inexplicable fact that the weakest regularization parameter in fact decreased stability.</p>
+<p>Disappointingly, the summary statistics are not significantly different than without regularization, except for the inexplicable fact that the weakest regularization parameter in fact decreased stability.</p>
 <p>The full details of the validation set accuracy during fine-tuning are plotted in an attempt to glean more information (click to enlarge).</p>
 <div class="full-width docutils">
 <a class="reference internal image-reference" href="_images/results.short_runs.l2sp.lr3e-5.png"><img alt="_images/results.short_runs.l2sp.lr3e-5.png" src="_images/results.short_runs.l2sp.lr3e-5.png" style="width: 100%;" /></a>
@@ -531,65 +537,65 @@ g_t=\nabla f_t(\theta_t)
 <div class="cell_output docutils container">
 <div class="output text_html"><style type="text/css">
 </style>
-<table id="T_fb07f">
+<table id="T_c1c69">
   <caption>Accuracy of ALBERT Fine-Tuned on RTE with AdamWL2SP for 20 Epochs at learning rate 3e-5</caption>
   <thead>
     <tr>
       <th class="index_name level0" >penalty:</th>
-      <th id="T_fb07f_level0_col0" class="col_heading level0 col0" >0</th>
-      <th id="T_fb07f_level0_col1" class="col_heading level0 col1" >1.5e-05</th>
-      <th id="T_fb07f_level0_col2" class="col_heading level0 col2" >0.00015</th>
-      <th id="T_fb07f_level0_col3" class="col_heading level0 col3" >0.0015</th>
+      <th id="T_c1c69_level0_col0" class="col_heading level0 col0" >0</th>
+      <th id="T_c1c69_level0_col1" class="col_heading level0 col1" >1.5e-05</th>
+      <th id="T_c1c69_level0_col2" class="col_heading level0 col2" >0.00015</th>
+      <th id="T_c1c69_level0_col3" class="col_heading level0 col3" >0.0015</th>
     </tr>
   </thead>
   <tbody>
     <tr>
-      <th id="T_fb07f_level0_row0" class="row_heading level0 row0" >mean</th>
-      <td id="T_fb07f_row0_col0" class="data row0 col0" >78.2%</td>
-      <td id="T_fb07f_row0_col1" class="data row0 col1" >79.3%</td>
-      <td id="T_fb07f_row0_col2" class="data row0 col2" >77.5%</td>
-      <td id="T_fb07f_row0_col3" class="data row0 col3" >78.3%</td>
+      <th id="T_c1c69_level0_row0" class="row_heading level0 row0" >mean</th>
+      <td id="T_c1c69_row0_col0" class="data row0 col0" >78.2%</td>
+      <td id="T_c1c69_row0_col1" class="data row0 col1" >79.3%</td>
+      <td id="T_c1c69_row0_col2" class="data row0 col2" >77.5%</td>
+      <td id="T_c1c69_row0_col3" class="data row0 col3" >78.3%</td>
     </tr>
     <tr>
-      <th id="T_fb07f_level0_row1" class="row_heading level0 row1" >std</th>
-      <td id="T_fb07f_row1_col0" class="data row1 col0" >6.1%</td>
-      <td id="T_fb07f_row1_col1" class="data row1 col1" >4.7%</td>
-      <td id="T_fb07f_row1_col2" class="data row1 col2" >8.4%</td>
-      <td id="T_fb07f_row1_col3" class="data row1 col3" >6.0%</td>
+      <th id="T_c1c69_level0_row1" class="row_heading level0 row1" >std</th>
+      <td id="T_c1c69_row1_col0" class="data row1 col0" >6.1%</td>
+      <td id="T_c1c69_row1_col1" class="data row1 col1" >4.7%</td>
+      <td id="T_c1c69_row1_col2" class="data row1 col2" >8.4%</td>
+      <td id="T_c1c69_row1_col3" class="data row1 col3" >6.0%</td>
     </tr>
     <tr>
-      <th id="T_fb07f_level0_row2" class="row_heading level0 row2" >min</th>
-      <td id="T_fb07f_row2_col0" class="data row2 col0" >47.7%</td>
-      <td id="T_fb07f_row2_col1" class="data row2 col1" >52.7%</td>
-      <td id="T_fb07f_row2_col2" class="data row2 col2" >47.3%</td>
-      <td id="T_fb07f_row2_col3" class="data row2 col3" >49.5%</td>
+      <th id="T_c1c69_level0_row2" class="row_heading level0 row2" >min</th>
+      <td id="T_c1c69_row2_col0" class="data row2 col0" >47.7%</td>
+      <td id="T_c1c69_row2_col1" class="data row2 col1" >52.7%</td>
+      <td id="T_c1c69_row2_col2" class="data row2 col2" >47.3%</td>
+      <td id="T_c1c69_row2_col3" class="data row2 col3" >49.5%</td>
     </tr>
     <tr>
-      <th id="T_fb07f_level0_row3" class="row_heading level0 row3" >max</th>
-      <td id="T_fb07f_row3_col0" class="data row3 col0" >83.4%</td>
-      <td id="T_fb07f_row3_col1" class="data row3 col1" >84.5%</td>
-      <td id="T_fb07f_row3_col2" class="data row3 col2" >83.4%</td>
-      <td id="T_fb07f_row3_col3" class="data row3 col3" >84.5%</td>
+      <th id="T_c1c69_level0_row3" class="row_heading level0 row3" >max</th>
+      <td id="T_c1c69_row3_col0" class="data row3 col0" >83.4%</td>
+      <td id="T_c1c69_row3_col1" class="data row3 col1" >84.5%</td>
+      <td id="T_c1c69_row3_col2" class="data row3 col2" >83.4%</td>
+      <td id="T_c1c69_row3_col3" class="data row3 col3" >84.5%</td>
     </tr>
     <tr>
-      <th id="T_fb07f_level0_row4" class="row_heading level0 row4" >max_path</th>
-      <td id="T_fb07f_row4_col0" class="data row4 col0" >84.5%</td>
-      <td id="T_fb07f_row4_col1" class="data row4 col1" >84.5%</td>
-      <td id="T_fb07f_row4_col2" class="data row4 col2" >84.5%</td>
-      <td id="T_fb07f_row4_col3" class="data row4 col3" >84.5%</td>
+      <th id="T_c1c69_level0_row4" class="row_heading level0 row4" >max_path</th>
+      <td id="T_c1c69_row4_col0" class="data row4 col0" >84.5%</td>
+      <td id="T_c1c69_row4_col1" class="data row4 col1" >84.5%</td>
+      <td id="T_c1c69_row4_col2" class="data row4 col2" >84.5%</td>
+      <td id="T_c1c69_row4_col3" class="data row4 col3" >84.5%</td>
     </tr>
     <tr>
-      <th id="T_fb07f_level0_row5" class="row_heading level0 row5" >failed runs</th>
-      <td id="T_fb07f_row5_col0" class="data row5 col0" >1</td>
-      <td id="T_fb07f_row5_col1" class="data row5 col1" >1</td>
-      <td id="T_fb07f_row5_col2" class="data row5 col2" >2</td>
-      <td id="T_fb07f_row5_col3" class="data row5 col3" >1</td>
+      <th id="T_c1c69_level0_row5" class="row_heading level0 row5" >failed runs</th>
+      <td id="T_c1c69_row5_col0" class="data row5 col0" >1</td>
+      <td id="T_c1c69_row5_col1" class="data row5 col1" >1</td>
+      <td id="T_c1c69_row5_col2" class="data row5 col2" >2</td>
+      <td id="T_c1c69_row5_col3" class="data row5 col3" >1</td>
     </tr>
   </tbody>
 </table>
 </div></div>
 </div>
-<p>There is some improvement at the weakest regularization <span class="math notranslate nohighlight">\(\lambda_1=0.5 \alpha = 1.5e^{-5}\)</span>. It has the highest average accuracy and lowerst standard deviation. It also has a higher maximum accuracy than fine-tuning at <span class="math notranslate nohighlight">\(\alpha=2e^{-5}\)</span>. While this was the best performing setting, we would need to run more tests to determine whether this is a statistically significant effect.</p>
+<p>There is some improvement at the weakest regularization <span class="math notranslate nohighlight">\(\lambda_1=0.5 \alpha = 1.5e^{-5}\)</span>. It has the highest average accuracy and lowest standard deviation. It also has a higher maximum accuracy than fine-tuning at <span class="math notranslate nohighlight">\(\alpha=2e^{-5}\)</span>. While this was the best performing setting, we would need to run more tests to determine whether this is a statistically significant effect.</p>
 <p>Unfortunately, there is still one failed fine-tuning run contrary to our hopes that <span class="math notranslate nohighlight">\(\ltsp\)</span> regularization would mitigate this.</p>
 </section>
 <section id="accuracy-vs-epoch-plot">
@@ -647,7 +653,7 @@ g_t=\nabla f_t(\theta_t)
     <a class='right-next' id="next-link" href="conclusion.html" title="next page">
     <div class="prev-next-info">
         <p class="prev-next-subtitle">next</p>
-        <p class="prev-next-title">Conculsions</p>
+        <p class="prev-next-title">Conclusions</p>
     </div>
     <i class="fas fa-angle-right"></i>
     </a>
