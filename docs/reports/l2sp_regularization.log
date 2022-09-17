@@ -32,8 +32,8 @@ nbclient.exceptions.CellTimeoutError: A cell timed out while it was being execut
 The message was: Cell execution timed out.
 Here is a preview of the cell contents:
 -------------------
-['metrics_accuracy = dict(', '    metrics=dict(train_accuracy="train accuracy", eval_accuracy="validation accuracy"),', '    colors=[colors_saved[4], colors_saved[5]],', "    marker='o',", "    linestyle='solid'"]
+['import matplotlib as mpl', 'from cycler import cycler', '', "prop_cycle = mpl.rcParams['axes.prop_cycle']", "colors_saved = prop_cycle.by_key()['color']"]
 ...
-['', 'show_metrics_plot(results.loc[results[\'lambda_1\'] == 0.5], metrics_accuracy, n_rows, n_cols, by=BY, suptitle=title, label="Accuracy", ', '                  scale=(plot_scale, plot_scale), legend_adj=(0.992, 1.04), ticker_base=5.0, ', '                  callbacks=[draw_max, draw_fail], ', "                  image_file='_images/results.long_run.l2sp_0.5.lr3e-5.png')"]
+['def draw_fail(ax, results):', "    ax.axhline(y=FAIL, label='failure', color='red', xmin=0.03, xmax=0.97, linestyle='--', linewidth=1.25)", "show_metrics_plot(results, metric_accuracy, n_rows, n_cols, by=BY, suptitle=title, label='Accuracy', ", '                  scale=(plot_scale, plot_scale), legend_title="$\\lambda_1\'$", legend_adj=(0.992, 1.09), callbacks=draw_fail,', "                  image_file='_images/results.short_runs.l2sp.lr3e-5.png')"]
 -------------------
 
