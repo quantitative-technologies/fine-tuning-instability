@@ -2,6 +2,9 @@
 
 # Our experiments were done with torch-1.12.0, datasets-1.11.0, transformers tag v4.20.1 and the torch_xla-1.12 wheel below.
 
+pip install torch==1.12.0
+pip install datasets==1.11.0
+
 # Check for TPU
 if [ "$1" == 'TPU' ]
 then
@@ -10,9 +13,6 @@ then
 else
     printf "\nNot using TPU\n"
 fi
-
-pip install torch==1.12.0
-pip install datasets==1.11.0
 
 # Additional dependency for our library
 pip install aenum
